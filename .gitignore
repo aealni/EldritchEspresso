@@ -1,3 +1,17 @@
+#vscoode stuff + add personal gitignore settings if u feel
+.vscode/
+*.code-workspace
+!.vscode/launch.json
+!.vscode/settings.json
+.vscode/tasks.json
+.vscode/keybindings.json
+.vscode/*.log
+
+
+
+
+
+# auto file from github for unity
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
