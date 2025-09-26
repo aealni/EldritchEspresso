@@ -7,8 +7,8 @@ public class Ingredient : Item
     [Range(1, 64)]
     public int quantity = 1;
     [Range(0f, 1f)]
-    public boolean isStrange = false;
-    public boolean isDeadly = false;
+    public bool isStrange = false;
+    public bool isDeadly = false;
 
     private void OnValidate()
     {
