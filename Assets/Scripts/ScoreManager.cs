@@ -7,3 +7,4 @@ public class ScoreManager : MonoBehaviour
 
   public event Action<int> OnScoreChanged;
   public event Action<int> OnHighScoreChanged;
+}
