@@ -1,5 +1,9 @@
 name: Cleanup Old Releases
 
+permissions:
+  contents: write
+  packages: write
+
 on:
   workflow_run:
     workflows: ["Unity Build and Release"]
