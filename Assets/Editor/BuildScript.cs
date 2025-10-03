@@ -64,4 +64,9 @@ public static class BuildScript
             CompilationPipeline.assemblyCompilationFinished -= OnAssemblyCompilationFinished;
         }
     }
+    [MenuItem("Build/Run Compile Only")]
+    public static void CompileFromMenu()
+    {
+        CompileOnly();
+    }
 }
