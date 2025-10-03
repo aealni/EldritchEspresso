@@ -17,5 +17,5 @@ jobs:
         uses: devops-infra/action-github-delete-release@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          keep_latest: 2        # keep last x releases, delete older ones
+          keep_latest: 3        # keep last x releases, delete older ones
           dry_run: false
