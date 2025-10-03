@@ -2,7 +2,7 @@ name: Unity Build and Release
 
 on:
   push:
-    branches: [ "ci-testtestestststest" ]
+    branches: [ "ci-test" ]
 
 jobs:
   build-and-release:
