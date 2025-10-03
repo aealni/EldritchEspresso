@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ingredient_script_guid_placeholder, type: 3}
+  m_Script: {fileID: 11500000, guid: cd888e34f41299242877beb93465f842, type: 3}
   m_Name: SampleCoffeeBeans
   m_EditorClassIdentifier: 
   itemName: Sample Coffee Beans
