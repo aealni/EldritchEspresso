@@ -23,3 +23,8 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
+          unityVersion: 6000.2.6f2
+          projectPath: .
+          targetPlatform: StandaloneWindows64
+          buildMethod: "BuildScript.CompileOnly"
+          allowDirtyBuild: true
