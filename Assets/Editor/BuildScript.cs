@@ -37,7 +37,7 @@ public static class BuildScript
             // Wait for compilation to complete 
             var start = DateTime.UtcNow;
             const int timeoutSeconds = 360; // 6 minutes
-            while (CompilationPipeline.isCompiling)
+            while (EditorApplication.isCompiling)
             {
                 Thread.Sleep(100);
                 if ((DateTime.UtcNow - start).TotalSeconds > timeoutSeconds)
