@@ -1,19 +1,31 @@
-name: Unity Build Check
+name: Unity Build and Release
 
 on:
-  pull_request:
-    branches: [ "ci-test" ]
   push:
-    branches: [ "ci-test" ]
+    branches: [ "ci-testtestestststest" ]
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
+
+      - name: Compile Unity scripts
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 6000.2.6f2
+          projectPath: .
+          targetPlatform: StandaloneWindows64
+          allowDirtyBuild: true
+          onlyCompile: true
 
       - name: Build Unity project
         uses: game-ci/unity-builder@v4
@@ -23,6 +35,23 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: 6000.2.6f2
-          targetPlatform: StandaloneWindows64
           projectPath: .
+          targetPlatform: StandaloneWindows64
           allowDirtyBuild: true
+
+      - name: Zip Build
+        run: |
+          cd Build
+          zip -r UnityBuild.zip StandaloneWindows64
+          cd ..
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v1.0.${{ github.run_number }}"
+          release_name: "Unity Build ${{ github.run_number }}"
+          draft: false
+          prerelease: false
