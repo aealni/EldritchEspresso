@@ -27,10 +27,12 @@ jobs:
       - name: Build project
         uses: game-ci/unity-builder@v4
         with:
-          unityVersion: 6000.2.4f1
-          targetPlatform: StandaloneWindows64
-          projectPath: .
-          allowDirtyBuild: true
+            unityVersion: 6000.2.4f1
+            targetPlatform: StandaloneWindows64
+            projectPath: .
+            allowDirtyBuild: true
+            skipActivation: true
+
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
