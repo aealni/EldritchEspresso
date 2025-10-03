@@ -9,7 +9,7 @@ public static class BuildScript
     public static void CompileOnly()
     {
         int errorCount = 0;
-    int assembliesFinished = 0;
+        int assembliesFinished = 0;
 
         void OnAssemblyCompilationFinished(string assemblyPath, CompilerMessage[] messages)
         {
@@ -32,13 +32,23 @@ public static class BuildScript
 
         try
         {
-            AssetDatabase.Refresh();
-            CompilationPipeline.RequestScriptCompilation();
+            AssetDatabase.Refresh(); // schedules compilation if needed
 
-            // maybe setup timeout later???
+            var start = DateTime.UtcNow;
+            int tick = 0;
+            if (!EditorApplication.isCompiling)
+            {
+                Debug.Log("[CompileOnly] No compilation required (already up to date).");
+            }
             while (EditorApplication.isCompiling)
             {
                 Thread.Sleep(250);
+                tick++;
+                if (tick % 40 == 0) // ~10 seconds
+                {
+                    var elapsed = (DateTime.UtcNow - start).TotalSeconds;
+                    Debug.Log($"[CompileOnly] Still compiling... {elapsed:F1}s elapsed, assemblies finished: {assembliesFinished}");
+                }
             }
 
             if (errorCount > 0)
@@ -57,6 +67,7 @@ public static class BuildScript
             CompilationPipeline.assemblyCompilationFinished -= OnAssemblyCompilationFinished;
         }
     }
+
     [MenuItem("Build/Run Compile Only")]
     public static void CompileFromMenu()
     {
