@@ -1,0 +1,21 @@
+name: Cleanup Old Releases
+
+on:
+  workflow_run:
+    workflows: ["Unity Build and Release"]
+    types:
+      - completed
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Delete old releases
+        uses: devops-infra/action-github-delete-release@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          keep_latest: 2        # keep last x releases, delete older ones
+          dry_run: false
