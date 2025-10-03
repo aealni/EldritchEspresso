@@ -35,7 +35,7 @@ jobs:
           targetPlatform: StandaloneWindows64
           allowDirtyBuild: true
           runAsHostUser: true
-      - name: Build directory permissions
+      - name: Set directory permissions
         if: success()
         run: |
             if [ -d build ]; then
@@ -54,24 +54,14 @@ jobs:
         with:
           name: UnityBuild-Windows64
           path: build/StandaloneWindows64
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create GitHub Release & Upload Asset
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v1.0.${{ github.run_number }}"
-          release_name: "Unity Build ${{ github.run_number }}"
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/UnityBuild-Windows64.zip
-          asset_name: UnityBuild-Windows64.zip
-          asset_content_type: application/zip
+            tag_name: v1.0.${{ github.run_number }}
+            name: Unity Build ${{ github.run_number }}
+            draft: false
+            prerelease: false
+            files: |
+              build/UnityBuild-Windows64.zip
