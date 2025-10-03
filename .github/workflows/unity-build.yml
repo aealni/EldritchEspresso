@@ -31,6 +31,14 @@ jobs:
           projectPath: .
           targetPlatform: StandaloneWindows64
           allowDirtyBuild: true
+          runAsHostUser: true
+      - name: Build directory permissions
+        if: success()
+        run: |
+            if [ -d build ]; then
+            sudo chown -R "$USER:$USER" build || true
+            sudo chmod -R u+rwX build || true
+            fi
 
       - name: Zip Build
         run: |
