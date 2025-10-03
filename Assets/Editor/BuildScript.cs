@@ -9,9 +9,13 @@ public static class BuildScript
     public static void CompileOnly()
     {
         int errorCount = 0;
+        int assembliesFinished = 0;
+        DateTime lastMessageTime = DateTime.UtcNow;
 
         void OnAssemblyCompilationFinished(string assemblyPath, CompilerMessage[] messages)
         {
+            assembliesFinished++;
+            lastMessageTime = DateTime.UtcNow;
             foreach (var msg in messages)
             {
                 if (msg.type == CompilerMessageType.Error)
@@ -30,21 +34,28 @@ public static class BuildScript
 
         try
         {
-            // Kick off a refresh + compile
             AssetDatabase.Refresh();
             CompilationPipeline.RequestScriptCompilation();
 
-            // Wait for compilation to complete 
+            // Wait for compilation to complete
             var start = DateTime.UtcNow;
-            const int timeoutSeconds = 360; // 6 minutes
+            const int hardTimeoutSeconds = 600; // 10 minutes for first cold import on CI
+            const int inactivityTimeoutSeconds = 90; // no compiler callbacks for 90s => stuck
             while (EditorApplication.isCompiling)
             {
-                Thread.Sleep(100);
-                if ((DateTime.UtcNow - start).TotalSeconds > timeoutSeconds)
+                Thread.Sleep(250);
+                var now = DateTime.UtcNow;
+                if ((now - start).TotalSeconds > hardTimeoutSeconds)
                 {
-                    Debug.LogError("Script compilation timed out.");
+                    Debug.LogError("[CompileOnly] Hard timeout exceeded. Aborting.");
                     errorCount++;
                     break;
+                }
+                if ((now - lastMessageTime).TotalSeconds > inactivityTimeoutSeconds && assembliesFinished == 0)
+                {
+                    // Likely waiting on asset import or license
+                    Debug.LogWarning("[CompileOnly] No compilation progress yet (still importing assets?). Waiting...");
+                    lastMessageTime = now; 
                 }
             }
 
@@ -55,7 +66,7 @@ public static class BuildScript
             }
             else
             {
-                Debug.Log("Compilation successful!");
+                Debug.Log($"Compilation successful! Assemblies finished: {assembliesFinished}");
                 EditorApplication.Exit(0);
             }
         }
