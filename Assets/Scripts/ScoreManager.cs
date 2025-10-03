@@ -14,11 +14,11 @@ public class ScoreManager : MonoBehaviour
   {
     if (Instance != null && Instance != this) 
     {
-      Destroy(GameObject);
+      Destroy(gameObject);
       return;
     }
     Instance = this;
-    DontDestroyOnLoad(GameObject);
+    DontDestroyOnLoad(gameObject);
   }
   
 
@@ -31,7 +31,7 @@ public class ScoreManager : MonoBehaviour
     {
       currentScore = 0;
     }
-  public void getCurrentScore()
+  public int getCurrentScore()
     {
       return currentScore;
     }
