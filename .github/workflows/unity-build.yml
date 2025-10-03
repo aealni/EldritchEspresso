@@ -17,15 +17,12 @@ jobs:
 
       - name: Build Unity project
         uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ env.unity_license }}
+          UNITY_EMAIL: ${{ env.unity_email }}
+          UNITY_PASSWORD: ${{ env.unity_password }}
         with:
           unityVersion: 6000.2.6f2
           targetPlatform: StandaloneWindows64
           projectPath: .
           allowDirtyBuild: true
-          skipActivation: true
-
-      - name: Upload Build Artifact (optional)
-        uses: actions/upload-artifact@v4
-        with:
-          name: UnityBuild-Windows
-          path: build/StandaloneWindows64
