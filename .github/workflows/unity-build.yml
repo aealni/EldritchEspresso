@@ -2,9 +2,9 @@ name: Unity CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "ci-test" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "ci-test" ]
 
 jobs:
   build:
