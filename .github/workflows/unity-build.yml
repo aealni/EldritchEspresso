@@ -3,6 +3,8 @@ name: Unity Build Check
 on:
   pull_request:
     branches: [ "ci-test" ]
+  push:
+    branches: [ "ci-test" ]
 
 jobs:
   build:
