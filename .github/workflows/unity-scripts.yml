@@ -9,12 +9,17 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('**/Packages/manifest.json') }}
 
       - name: Compile Unity project
         uses: game-ci/unity-builder@v4
@@ -28,3 +33,4 @@ jobs:
           targetPlatform: StandaloneWindows64
           buildMethod: "BuildScript.CompileOnly"
           allowDirtyBuild: true
+
