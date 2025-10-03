@@ -15,8 +15,8 @@ public class Customer : MonoBehaviour
     [Header("Movement")]
 
     [SerializeField] float movement_speed = 10;
-    [SerializeField] Vector2Int curr_pos = new(-1, -1);
-    [SerializeField] Vector2Int target_pos = new(-1, -1);
+    public Vector2Int curr_pos = new(-1, -1);
+    public Vector2Int target_pos = new(-1, -1);
     [SerializeField] Vector2Int next_move_pos = new(-1, -1);
 
     // [x, y]
@@ -91,11 +91,12 @@ public class Customer : MonoBehaviour
     void Leaving()
     {
         state = STATE.LEAVING;
+        CustomerManager.ReturnSeat(curr_pos);
         target_pos = CustomerManager.FindEntrance();
     }
 
     // TODO
-    void Move()
+    public void Move()
     {
         if (next_move_pos != new Vector2Int(-1, -1))
         {
@@ -105,11 +106,14 @@ public class Customer : MonoBehaviour
                 return;
             }
 
-            curr_pos = CustomerManager.UpdateGridPosition(curr_pos, next_move_pos, id);
+
+            CustomerManager.ResetSquare(curr_pos);
+            curr_pos = next_move_pos;
         }
 
         //Astar
         next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id);
+        CustomerManager.SetSquare(next_move_pos, id);
     }
 
     // Update is called once per frame
@@ -124,18 +128,16 @@ public class Customer : MonoBehaviour
         {
             if (curr_pos == target_pos)
             {
+                next_move_pos = new Vector2Int(-1, -1);
                 if (state == STATE.SEATING)
                 {
                     Ordering();
                 }
                 else if (state == STATE.LEAVING)
                 {
+                    CustomerManager.ResetSquare(curr_pos);
                     Destroy(gameObject);
                 }
-            }
-            else
-            {
-                Move();   
             }
         }
     }
