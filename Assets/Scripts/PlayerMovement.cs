@@ -12,9 +12,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void Update() {
-            float moveX = Input.GetAxisRaw("Horizontal");
-            float moveY = Input.GetAxisRaw("Vertical");
-            movement = new Vector2(moveX, moveY).normalized;
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
+        movement = new Vector2(moveX, moveY).normalized;
     }
 
     void FixedUpdate() {
