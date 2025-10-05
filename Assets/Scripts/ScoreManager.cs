@@ -4,9 +4,35 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public static ScoreManager Instance { get; private set; }
+    private static ScoreManager instance;
+    private static bool applicationIsQuitting;
 
-    private readonly Dictionary<string, int> miniGameScores = new();
+    public static ScoreManager Instance
+    {
+        get
+        {
+            if (applicationIsQuitting)
+            {
+                return null;
+            }
+
+            if (instance == null)
+            {
+                instance = FindObjectOfType<ScoreManager>();
+
+                if (instance == null)
+                {
+                    var managerObject = new GameObject(nameof(ScoreManager));
+                    instance = managerObject.AddComponent<ScoreManager>();
+                }
+            }
+
+            return instance;
+        }
+        private set => instance = value;
+    }
+
+    private readonly Dictionary<string, int> miniGameScores = new Dictionary<string, int>();
     private int currentScore;
     private int dayHighScore;
 
@@ -24,6 +50,20 @@ public class ScoreManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        StartNewDay();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        applicationIsQuitting = true;
     }
 
     public IReadOnlyDictionary<string, int> MiniGameScores => miniGameScores;
