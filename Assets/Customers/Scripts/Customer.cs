@@ -7,14 +7,14 @@ public class Customer : MonoBehaviour
 {
     [Header("Timers")]
 
-    [SerializeField] float ordering_patience = 20;
-    [SerializeField] float serving_patience = 20;
-    [SerializeField] float eating_duration = 5;
+    [SerializeField] float ordering_patience = 10;
+    [SerializeField] float serving_patience = 10;
+    [SerializeField] float eating_duration = 2;
     [SerializeField] float timer = -1;
 
     [Header("Movement")]
 
-    [SerializeField] float movement_speed = 10;
+    [SerializeField] float movement_speed = 15;
     public Vector2Int curr_pos = new(-1, -1);
     public Vector2Int target_pos = new(-1, -1);
     [SerializeField] Vector2Int next_move_pos = new(-1, -1);
@@ -100,6 +100,12 @@ public class Customer : MonoBehaviour
     {
         if (next_move_pos != new Vector2Int(-1, -1))
         {
+            if (CustomerManager.GetSquare(next_move_pos) > 0 && CustomerManager.GetSquare(next_move_pos) < id)
+            {
+                next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id);
+                CustomerManager.SetSquare(next_move_pos, id);
+            }
+
             transform.position = Vector2.MoveTowards(transform.position, CustomerManager.GridToWorld(next_move_pos), movement_speed * Time.deltaTime);
             if ((CustomerManager.GridToWorld(next_move_pos) - (Vector2)transform.position).magnitude > 0.01)
             {
