@@ -1,0 +1,70 @@
+name: Unity Build and Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('**/Packages/manifest.json') }}
+          restore-keys: |
+            Library-${{ runner.os }}-
+
+
+      - name: Build Unity project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 6000.2.6f2
+          projectPath: .
+          targetPlatform: StandaloneWindows64
+          allowDirtyBuild: true
+          runAsHostUser: true
+      - name: Set directory permissions
+        if: success()
+        run: |
+            if [ -d build ]; then
+            sudo chown -R "$USER:$USER" build || true
+            sudo chmod -R u+rwX build || true
+            fi
+
+      - name: Zip Build
+        run: |
+          cd build
+          zip -r UnityBuild-Windows64.zip StandaloneWindows64
+          cd ..
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UnityBuild-Windows64
+          path: build/StandaloneWindows64
+      - name: Create GitHub Release & Upload Asset
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            tag_name: v1.0.${{ github.run_number }}
+            name: Unity Build ${{ github.run_number }}
+            draft: false
+            prerelease: false
+            files: |
+              build/UnityBuild-Windows64.zip
