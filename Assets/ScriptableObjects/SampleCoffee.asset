@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: food_script_guid_placeholder, type: 3}
+  m_Script: {fileID: 11500000, guid: c0abb192f1555614c967bd3928195884, type: 3}
   m_Name: SampleCoffee
   m_EditorClassIdentifier: 
   itemName: Sample Coffee
