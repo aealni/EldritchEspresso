@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    [Header("Player Inventory - 3 Slots")]
-    [SerializeField] private InventorySlot[] slots = new InventorySlot[3];
+    [Header("Player Inventory - 4 Slots")]
+    [SerializeField] private InventorySlot[] slots = new InventorySlot[4];
     public Sprite texture;
 
     private void Awake()
