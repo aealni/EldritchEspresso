@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,6 +35,7 @@ public class ScoreManager : MonoBehaviour
     private readonly Dictionary<string, int> miniGameScores = new Dictionary<string, int>();
     private int currentScore;
     private int dayHighScore;
+    private int dayStartingScore;
 
     public event Action<int> OnScoreChanged;
     public event Action<int> OnDayHighScoreChanged;
@@ -69,6 +70,7 @@ public class ScoreManager : MonoBehaviour
     public IReadOnlyDictionary<string, int> MiniGameScores => miniGameScores;
     public int CurrentScore => currentScore;
     public int DayHighScore => dayHighScore;
+    public int CurrentDayScore => currentScore - dayStartingScore;
 
     public void AddMiniGameScore(string miniGameId, int amount)
     {
@@ -98,23 +100,24 @@ public class ScoreManager : MonoBehaviour
 
     public void EndDay()
     {
-        OnDayFinished?.Invoke(dayHighScore);
+        var dayScore = CurrentDayScore;
+
+        if (dayScore > dayHighScore)
+        {
+            dayHighScore = dayScore;
+            OnDayHighScoreChanged?.Invoke(dayHighScore);
+        }
+
+        OnDayFinished?.Invoke(dayScore);
         StartNewDay();
     }
 
     public void StartNewDay()
     {
-        currentScore = 0;
-        dayHighScore = 0;
-        miniGameScores.Clear();
+        dayStartingScore = currentScore;
 
         OnScoreChanged?.Invoke(currentScore);
         OnDayHighScoreChanged?.Invoke(dayHighScore);
-    }
-
-    public void ResetScore()
-    {
-        StartNewDay();
     }
 
     public int GetCurrentScore()
@@ -127,9 +130,11 @@ public class ScoreManager : MonoBehaviour
         currentScore += amount;
         OnScoreChanged?.Invoke(currentScore);
 
-        if (currentScore > dayHighScore)
+        var dayScore = CurrentDayScore;
+
+        if (dayScore > dayHighScore)
         {
-            dayHighScore = currentScore;
+            dayHighScore = dayScore;
             OnDayHighScoreChanged?.Invoke(dayHighScore);
         }
     }
