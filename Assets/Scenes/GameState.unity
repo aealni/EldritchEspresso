@@ -173,6 +173,7 @@ GameObject:
   m_Component:
   - component: {fileID: 863096860}
   - component: {fileID: 863096859}
+  - component: {fileID: 863096861}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -254,6 +255,19 @@ Transform:
   - {fileID: 428829797}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &863096861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863096858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00be5543cb0ccf848abcca5be0cd5e92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameTime
+  gameTime: 0
 --- !u!1 &1267648283
 GameObject:
   m_ObjectHideFlags: 0

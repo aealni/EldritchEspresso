@@ -1,13 +1,16 @@
 using UnityEngine;
+using System.Collections;
 
 public class GameTime : MonoBehaviour
 {
-    private float GameTime
+    
+    [SerializeField] private float gameTime;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        GameTime = 0f;
-        StartCoroutine(GameTimer());
+        //Debug.Log("Game Time Started");
+        gameTime = 0f;
+        StartCoroutine(gameTimer());
     }
 
     // Update is called once per frame
@@ -16,12 +19,12 @@ public class GameTime : MonoBehaviour
 
 
     }
-    IEnumerator GameTimer() {
+    IEnumerator gameTimer() {
         while (true)
         {
             yield return new WaitForSeconds(1f);
-            GameTime += 1f;
-            Debug.Log("Game Time: " + GameTime + " seconds");
+            gameTime += 1f;
+            //Debug.Log("Game Time: " + gameTime + " seconds");
             switch (gameTime)
             { 
                 case 60f:
