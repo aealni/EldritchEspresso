@@ -107,18 +107,18 @@ public class InventorySlot
             
             itemType = item;
             maxStackSize = item.maxStackSize;
-            int canAdd = Mathf.Min(quantity, maxStackSize);
-            currentStack = canAdd;
-            return quantity - canAdd;
+            int unstackedAdd = Mathf.Min(quantity, maxStackSize);
+            currentStack = unstackedAdd;
+            return quantity - unstackedAdd;
         }
 
         // Handle existing items
         if (!itemType.CanStackWith(item)) return quantity; // Items don't match
 
         int spaceAvailable = maxStackSize - currentStack;
-        int canAdd = Mathf.Min(quantity, spaceAvailable);
-        currentStack += canAdd;
-        return quantity - canAdd;
+        int stackedAdd = Mathf.Min(quantity, spaceAvailable);
+        currentStack += stackedAdd;
+        return quantity - stackedAdd;
     }
 
     /// <summary>
