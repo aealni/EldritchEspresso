@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Customer : MonoBehaviour
 {
     [Header("Timers")]
 
-    [SerializeField] float ordering_patience = 10;
-    [SerializeField] float serving_patience = 10;
-    [SerializeField] float eating_duration = 2;
-    [SerializeField] float timer = -1;
+    public float ordering_patience = 10;
+    public float serving_patience = 10;
+    public float eating_duration = 2;
+    float timer = -1;
 
     [Header("Movement")]
 
-    [SerializeField] float movement_speed = 15;
-    public Vector2Int curr_pos = new(-1, -1);
-    public Vector2Int target_pos = new(-1, -1);
-    [SerializeField] Vector2Int next_move_pos = new(-1, -1);
+    public float movement_speed = 15;
+    Vector2Int curr_pos = new(-1, -1);
+    Vector2Int target_pos = new(-1, -1);
+    Vector2Int next_move_pos = new(-1, -1);
+
+    public int id { get; private set; }
 
     // [x, y]
     // 0 is empty
@@ -38,11 +39,9 @@ public class Customer : MonoBehaviour
         LEAVING
     }
 
-    [SerializeField] STATE state;
-    [SerializeField] List<DummyFood> menu;
-    [SerializeField] DummyFood order;
-
-    [SerializeField] int id;
+    STATE state;
+    List<DummyFood> menu;
+    DummyFood order;
 
     public void Activate(int new_id, Vector2Int spawn_pos, Vector2Int seat)
     {
@@ -53,39 +52,38 @@ public class Customer : MonoBehaviour
         state = STATE.SEATING;
     }
 
+
+    /// <summary>
+    /// TO-DO: RANDOMLY CHOOSE A MENU OPTION
+    /// </summary>
     void Ordering()
     {
         state = STATE.ORDERING;
-
-        // if (menu.Count == 0)
-        // {
-        //     // Wait for seat TODO
-        //     Debug.LogError("No items on menu!");
-        // }
-        // order = menu[UnityEngine.Random.Range(0, menu.Count)];
         timer = ordering_patience;
+
+        // add code here
     }
 
+    /// <summary>
+    /// TO-DO: SHOULD RETURN THE CUSTOMER'S ORDER
+    /// </summary>
     public void TakeOrder()
-    {
-        Waiting();
-    }
-
-    void Waiting()
     {
         state = STATE.WAITING;
         timer = serving_patience;
+
+        // add code here
     }
 
-    void GiveOrder()
-    {
-        Eating();
-    }
-
-    void Eating()
+    /// <summary>
+    /// TO-DO: TAKES IN A FOOD ARGUEMENT SO THAT WE CAN CHECK IF ITS THE RIGHT FOOD
+    /// </summary>
+    public void ServeFood()
     {
         state = STATE.EATING;
         timer = eating_duration;
+
+        // add code here
     }
 
     void Leaving()
@@ -96,22 +94,15 @@ public class Customer : MonoBehaviour
     }
 
     // TODO
-    public void Move()
+    void Move()
     {
         if (next_move_pos != new Vector2Int(-1, -1))
         {
-            if (CustomerManager.GetSquare(next_move_pos) > 0 && CustomerManager.GetSquare(next_move_pos) < id)
-            {
-                next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id);
-                CustomerManager.SetSquare(next_move_pos, id);
-            }
-
             transform.position = Vector2.MoveTowards(transform.position, CustomerManager.GridToWorld(next_move_pos), movement_speed * Time.deltaTime);
             if ((CustomerManager.GridToWorld(next_move_pos) - (Vector2)transform.position).magnitude > 0.01)
             {
                 return;
             }
-
 
             CustomerManager.ResetSquare(curr_pos);
             curr_pos = next_move_pos;
@@ -125,6 +116,7 @@ public class Customer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(id);
         if (timer > 0 && (timer -= Time.deltaTime) < 0)
         {
             Leaving();
@@ -144,6 +136,9 @@ public class Customer : MonoBehaviour
                     CustomerManager.ResetSquare(curr_pos);
                     Destroy(gameObject);
                 }
+            } else
+            {
+                Move();
             }
         }
     }
