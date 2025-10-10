@@ -18,7 +18,7 @@ public class ScoreManager : MonoBehaviour
 
             if (instance == null)
             {
-                instance = FindObjectOfType<ScoreManager>();
+                instance = FindFirstObjectByType<ScoreManager>();
 
                 if (instance == null)
                 {
