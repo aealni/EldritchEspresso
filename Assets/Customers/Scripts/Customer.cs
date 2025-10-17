@@ -7,9 +7,9 @@ public class Customer : MonoBehaviour
 {
     [Header("Timers")]
 
-    [SerializeField] float ordering_patience = 10;
-    [SerializeField] float serving_patience = 10;
-    [SerializeField] float eating_duration = 2;
+    [SerializeField] float ordering_patience;
+    [SerializeField] float serving_patience;
+    [SerializeField] float eating_duration;
     [SerializeField] float timer = -1;
 
     [Header("Movement")]
@@ -39,8 +39,8 @@ public class Customer : MonoBehaviour
     }
 
     [SerializeField] STATE state;
-    [SerializeField] List<DummyFood> menu;
-    [SerializeField] DummyFood order;
+    [SerializeField] List<Food> menu;
+    [SerializeField] Food order;
 
     [SerializeField] int id;
 
@@ -57,29 +57,35 @@ public class Customer : MonoBehaviour
     {
         state = STATE.ORDERING;
 
-        // if (menu.Count == 0)
-        // {
-        //     // Wait for seat TODO
-        //     Debug.LogError("No items on menu!");
-        // }
-        // order = menu[UnityEngine.Random.Range(0, menu.Count)];
+        if (menu.Count == 0)
+        {
+            // Wait for seat TODO
+            // Debug.LogError("No items on menu!");
+        }
+        else
+        {
+            order = menu[UnityEngine.Random.Range(0, menu.Count)];
+        }
+        
         timer = ordering_patience;
     }
 
-    public void TakeOrder()
-    {
-        Waiting();
-    }
-
-    void Waiting()
+    public Food TakeOrder()
     {
         state = STATE.WAITING;
         timer = serving_patience;
+        return order;
     }
 
-    void GiveOrder()
+    public bool GiveOrder(Food f)
     {
-        Eating();
+        if (f == order)
+        {
+            Eating();
+            return true;
+        }
+
+        return false;
     }
 
     void Eating()
@@ -125,9 +131,14 @@ public class Customer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (timer > 0 && (timer -= Time.deltaTime) < 0)
+        if (timer > 0)
         {
-            Leaving();
+            timer -= Time.deltaTime;
+
+            if (timer < 0)
+            {
+                Leaving();
+            }
         }
 
         if (target_pos != new Vector2Int(-1, -1))
@@ -143,8 +154,11 @@ public class Customer : MonoBehaviour
                 {
                     CustomerManager.ResetSquare(curr_pos);
                     Destroy(gameObject);
+                    return;
                 }
             }
+
+            Move();
         }
     }
 }
