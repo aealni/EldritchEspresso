@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class CustomerManager : MonoBehaviour
 {
+    [Header("Customer Settings")]
     public GameObject customer_prefab; // changes to non static so we can drag in
-    public List<Customer> customer_list;
-    static readonly float spawn_delay = 1.5F;
+    public static float spawn_delay = 1.5F;
     static float timer;
 
     /*
@@ -18,15 +16,17 @@ public class CustomerManager : MonoBehaviour
     -2 are entrances
     */
     static int[,] grid;
-
     static int[,] start_grid;
 
-    static readonly Vector2Int grid_offset = Vector2Int.zero; // Bottom Left Corner
+    [Header("Grid Settings")]
+
+    static readonly Vector2 grid_offset = Vector2.zero; // Bottom Left Corner
     static readonly int grid_square_size = 1;
-    static readonly int padding = 2;
+    static readonly int padding = 2;    
+
+
     static List<Vector2Int> seats = new();
     static readonly List<Vector2Int> entrances = new();
-
     static List<Vector2Int> spawn_locations = new();
 
 
@@ -48,7 +48,6 @@ public class CustomerManager : MonoBehaviour
             return;
         }
 
-        Debug.Log(new_spawn_pos);
         GameObject new_customer = Instantiate(customer_prefab);
         Customer new_customer_script = new_customer.GetComponent<Customer>();
 
@@ -57,8 +56,6 @@ public class CustomerManager : MonoBehaviour
         grid[new_spawn_pos.x, new_spawn_pos.y] = new_id;
         new_customer.transform.position = GridToWorld(new_spawn_pos);
         new_customer_script.Activate(new_id, new_spawn_pos, seat_target);
-
-        customer_list.Add(new_customer_script);
     }
 
     Vector2Int FindSpawnLocation()
@@ -101,30 +98,6 @@ public class CustomerManager : MonoBehaviour
         return entrances[UnityEngine.Random.Range(0, entrances.Count)];
     }
 
-    public void MoveCustomers()
-    {
-        int i = 0;
-        while (i < customer_list.Count)
-        {
-            Customer c = customer_list[i];
-
-            if (c == null)
-            {
-                customer_list.Remove(c);
-                continue;
-            }
-
-            i++;
-
-            if (c.target_pos == new Vector2Int(-1, -1) || c.curr_pos == c.target_pos)
-            {
-                continue;
-            }
-
-            c.Move();
-        }
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -135,8 +108,6 @@ public class CustomerManager : MonoBehaviour
             SpawnCustomer();
             timer = 0;
         }
-
-        MoveCustomers();
     }
 
     public static Vector2 GridToWorld(Vector2Int pos)
@@ -260,13 +231,13 @@ public class CustomerManager : MonoBehaviour
         return path[path.Count - 1];
     }
 
-    public static void CreateGrid()
+    static void CreateGrid()
     {
         int[,] data = {
-            {1, 1, 1, -2, -2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 1, 1, -2, -2, -2, -2, -2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -303,7 +274,7 @@ public class CustomerManager : MonoBehaviour
 
     }
 
-    public static void ParseGrid()
+    static void ParseGrid()
     {
         for (int x = 0; x < grid.GetLength(0); x++) //Rows
         {
