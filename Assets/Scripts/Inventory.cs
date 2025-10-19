@@ -21,16 +21,6 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
-    /// Adds an item to the inventory using stacking logic with exact parameter matching
-    /// </summary>
-    /// <param name="item">Item to add</param>
-    /// <returns>True if item was added successfully</returns>
-    public bool AddItem(Item item)
-    {
-        return AddItem(item, 1) > 0;
-    }
-
-    /// <summary>
     /// Adds a specific quantity of items to the inventory using stacking logic
     /// </summary>
     /// <param name="item">Item to add</param>
@@ -106,16 +96,6 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
-    /// Removes item from specific slot
-    /// </summary>
-    /// <param name="slotIndex">The inventory slot (0-2)</param>
-    /// <returns>True if item was removed</returns>
-    public bool RemoveItem(int slotIndex)
-    {
-        return RemoveItemFromSlot(slotIndex, 1) > 0;
-    }
-
-    /// <summary>
     /// Removes a specific quantity of items matching the given item type (exact parameter matching)
     /// </summary>
     /// <param name="itemType">Item type to remove</param>
@@ -178,7 +158,7 @@ public class Inventory : MonoBehaviour
     /// <summary>
     /// Gets the quantity of items in a specific slot
     /// </summary>
-    /// <param name="slotIndex">Slot index (0-2)</param>
+    /// <param name="slotIndex">Slot index (0-3)</param>
     /// <returns>Quantity in slot, or 0 if empty/invalid</returns>
     public int GetSlotQuantity(int slotIndex)
     {
