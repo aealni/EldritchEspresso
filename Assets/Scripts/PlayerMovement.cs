@@ -32,34 +32,34 @@ public class PlayerMovement : MonoBehaviour
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) input.x += 1;
         }
 
-        movement = input.normalized;
+        // movement = input.normalized;
 
-        bool isMoving = movement.sqrMagnitude > 0.01f;
-        animator.SetBool("isMoving", isMoving);
+        // bool isMoving = movement.sqrMagnitude > 0.01f;
+        // animator.SetBool("isMoving", isMoving);
 
-        if (isMoving)
-        {
-            if (Mathf.Abs(movement.y) >= Mathf.Abs(movement.x))
-            {
-                animator.SetFloat("moveX", 0);
-                animator.SetFloat("moveY", movement.y > 0 ? 1 : -1);
-            }
-            else
-            {
-                animator.SetFloat("moveX", movement.x > 0 ? 1 : -1);
-                animator.SetFloat("moveY", 0);
-                if (spriteRenderer != null)
-                {
-                    spriteRenderer.flipX = movement.x < 0;
-                }
-            }
-        }
-        else
-        {
-            // Idle
-            animator.SetFloat("moveX", 0);
-            animator.SetFloat("moveY", 0);
-        }
+        // if (isMoving)
+        // {
+        //     if (Mathf.Abs(movement.y) >= Mathf.Abs(movement.x))
+        //     {
+        //         animator.SetFloat("moveX", 0);
+        //         animator.SetFloat("moveY", movement.y > 0 ? 1 : -1);
+        //     }
+        //     else
+        //     {
+        //         animator.SetFloat("moveX", movement.x > 0 ? 1 : -1);
+        //         animator.SetFloat("moveY", 0);
+        //         if (spriteRenderer != null)
+        //         {
+        //             spriteRenderer.flipX = movement.x < 0;
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     // Idle
+        //     animator.SetFloat("moveX", 0);
+        //     animator.SetFloat("moveY", 0);
+        // }
     }
 
     void FixedUpdate()

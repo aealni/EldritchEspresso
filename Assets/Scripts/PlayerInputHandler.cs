@@ -125,7 +125,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
         
         // Interact with container (key F or Interact action)
-        if (Input.GetKeyDown(KeyCode.F) || Input.GetButtonDown("Interact"))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             OnInteractPressed?.Invoke();
         }
