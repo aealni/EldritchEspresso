@@ -4,7 +4,7 @@ public class Ingredient : Item
 {
     [Header("Ingredient Properties")]
     [Range(1, 64)]
-    /// public int quantity = 1;
+    public int quantity = 1;
     
     /// <summary>
     /// Override maxStackSize for Ingredient items (default 64)
