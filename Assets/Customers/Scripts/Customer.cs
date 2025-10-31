@@ -19,6 +19,8 @@ public class Customer : MonoBehaviour
     public Vector2Int target_pos = new(-1, -1);
     [SerializeField] Vector2Int next_move_pos = new(-1, -1);
 
+    public SpriteRenderer sprite_renderer;
+
     // [x, y]
     // 0 is empty
     // -1 is seats
@@ -51,6 +53,8 @@ public class Customer : MonoBehaviour
         target_pos = seat;
 
         state = STATE.SEATING;
+
+        sprite_renderer = GetComponent<SpriteRenderer>();
     }
 
     void Ordering()
@@ -72,6 +76,10 @@ public class Customer : MonoBehaviour
 
     public Food TakeOrder()
     {
+        if (state != STATE.ORDERING)
+        {
+            return null;
+        }
         state = STATE.WAITING;
         timer = serving_patience;
         return order;
@@ -79,21 +87,15 @@ public class Customer : MonoBehaviour
 
     public bool GiveOrder(Food f)
     {
-        if (f == order)
+        if (f == order && state == STATE.WAITING)
         {
-            Eating();
+            state = STATE.EATING;
+            timer = eating_duration;
             return true;
         }
 
         return false;
     }
-
-    void Eating()
-    {
-        state = STATE.EATING;
-        timer = eating_duration;
-    }
-
     void Leaving()
     {
         state = STATE.LEAVING;
@@ -128,9 +130,24 @@ public class Customer : MonoBehaviour
         CustomerManager.SetSquare(next_move_pos, id);
     }
 
+    Color ChangeColor()
+    {
+        return state switch
+        {
+            STATE.SEATING => Color.white,
+            STATE.ORDERING => Color.blue,
+            STATE.WAITING => Color.yellow,
+            STATE.EATING => Color.green,
+            _ => Color.red,
+        };
+
+    }
+
     // Update is called once per frame
     void Update()
     {
+        sprite_renderer.color = ChangeColor();
+
         if (timer > 0)
         {
             timer -= Time.deltaTime;
