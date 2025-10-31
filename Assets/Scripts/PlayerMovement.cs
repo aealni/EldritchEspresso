@@ -30,7 +30,23 @@ public class PlayerMovement : MonoBehaviour
             if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) input.y -= 1;
             if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) input.x -= 1;
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) input.x += 1;
+            if (Keyboard.current.spaceKey.isPressed)
+            {
+                // RaycastHit2D ray = Physics2D.CircleCast(transform.position, 10f, Vector2.zero, 0);
+                // Customer customer1 = ray.collider.gameObject.GetComponent<Customer>();
+                // customer1.TakeOrder();
+            }
         }
+        RaycastHit2D ray = Physics2D.CircleCast(transform.position, 2.5f, Vector2.zero, 0);
+        if (ray.collider != null && ray.collider.gameObject.GetComponent<Customer>() != null)
+        {
+            Customer customer1 = ray.collider.gameObject.GetComponent<Customer>();
+            customer1.TakeOrder();
+
+        }
+        
+
+
 
         movement = input.normalized;
 
@@ -65,5 +81,11 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 2.5f);
     }
 }

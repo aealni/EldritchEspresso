@@ -226,7 +226,7 @@ public class CustomerManager : MonoBehaviour
             backtrack = parent_lookup[backtrack];
         }
 
-        Debug.Log(path[path.Count - 1]);
+        // Debug.Log(path[path.Count - 1]);
 
         return path[path.Count - 1];
     }
