@@ -110,7 +110,7 @@ public class Customer : MonoBehaviour
         {
             if (CustomerManager.GetSquare(next_move_pos) > 0 && CustomerManager.GetSquare(next_move_pos) < id)
             {
-                next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id);
+                next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id, target_pos);
                 CustomerManager.SetSquare(next_move_pos, id);
             }
 
@@ -126,7 +126,7 @@ public class Customer : MonoBehaviour
         }
 
         //Astar
-        next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id);
+        next_move_pos = CustomerManager.Astar(curr_pos, target_pos, id, target_pos);
         CustomerManager.SetSquare(next_move_pos, id);
     }
 
