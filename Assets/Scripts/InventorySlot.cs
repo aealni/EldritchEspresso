@@ -9,6 +9,7 @@ public class InventorySlot
     [SerializeField] private Item itemType;
     [SerializeField] private int currentStack;
     [SerializeField] private int maxStackSize;
+    [SerializeField] private bool isSelected = false;
 
     /// <summary>
     /// Creates an empty inventory slot
@@ -162,5 +163,51 @@ public class InventorySlot
     {
         if (IsEmpty()) return 0; // Empty slots don't have predetermined space
         return Mathf.Max(0, maxStackSize - currentStack);
+    }
+    
+    // Selection-related methods
+    
+    /// <summary>
+    /// Gets whether this slot is currently selected
+    /// </summary>
+    /// <returns>True if slot is selected</returns>
+    public bool IsSelected()
+    {
+        return isSelected;
+    }
+    
+    /// <summary>
+    /// Sets the selection state of this slot
+    /// </summary>
+    /// <param name="selected">Whether slot should be selected</param>
+    public void SetSelected(bool selected)
+    {
+        if (isSelected != selected)
+        {
+            isSelected = selected;
+            OnSelectionChanged?.Invoke(this);
+        }
+    }
+    
+    /// <summary>
+    /// Event triggered when selection state changes
+    /// </summary>
+    public System.Action<InventorySlot> OnSelectionChanged;
+    
+    /// <summary>
+    /// Gets a description of this slot for debugging
+    /// </summary>
+    /// <returns>String description of the slot</returns>
+    public string GetDescription()
+    {
+        if (IsEmpty())
+        {
+            return $"Slot: Empty{(isSelected ? " [SELECTED]" : "")}";
+        }
+        else
+        {
+            string stackInfo = currentStack > 1 ? $" x{currentStack}" : "";
+            return $"Slot: {itemType.itemName}{stackInfo}{(isSelected ? " [SELECTED]" : "")}";
+        }
     }
 }

@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 9033040551241944999}
   - component: {fileID: 3345602249948439831}
   - component: {fileID: 6788734558233030925}
+  - component: {fileID: 1111111111111111111}
+  - component: {fileID: 2222222222222222222}
+  - component: {fileID: 3333333333333333333}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -129,10 +132,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 491571749531059501}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6258b3e5d6598dd49a6a90bcc2db51a9, type: 3}
+  m_Script: {fileID: 11500000, guid: 0000000000000000000000000000000000, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  speed: 3
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  speed: 6
+  inventory: {fileID: 0}
+  selectedSlot: 0
+  interactionRange: 3
+  containerLayerMask:
+    serializedVersion: 2
+    m_Bits: -1
+  inputHandler: {fileID: 0}
 --- !u!61 &6788734558233030925
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -179,3 +189,49 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1111111111111111111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491571749531059501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0000000000000000000000000000000000, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  slots: []
+  selectedSlot: 0
+  texture: {fileID: 0}
+--- !u!114 &2222222222222222222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491571749531059501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0000000000000000000000000000000000, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContainerDetector
+  detectionRange: 3
+  containerLayerMask:
+    serializedVersion: 2
+    m_Bits: -1
+  detectionInterval: 0.1
+  showDebugInfo: 1
+--- !u!114 &3333333333333333333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491571749531059501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0000000000000000000000000000000000, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
+  useNewInputSystem: 0

@@ -135,7 +135,7 @@ public class CustomerManager : MonoBehaviour
         grid[curr_pos.x, curr_pos.y] = start_grid[curr_pos.x, curr_pos.y];
     }
 
-    public static Vector2Int Astar(Vector2Int start, Vector2Int target, int id)
+    public static Vector2Int Astar(Vector2Int start, Vector2Int target, int id, Vector2Int target_pos)
     {
         if (start == target)
         {
@@ -186,9 +186,27 @@ public class CustomerManager : MonoBehaviour
                     {
                         continue;
                     }
-                    
+
                     //fail cases
-                    if (child.x < 0 || child.y < 0 || child.x >= grid.GetLength(0) || child.y >= grid.GetLength(1) || (grid[child.x, child.y] > 0 && grid[child.x, child.y] < id))
+                    if (child.x < 0 || child.y < 0 || child.x >= grid.GetLength(0) || child.y >= grid.GetLength(1))
+                    {
+                        continue;
+                    }
+
+                    //obstacles or higher priority customers
+                    if (grid[child.x, child.y] > 0 && grid[child.x, child.y] < id)
+                    {
+                        continue;
+                    }
+
+                    //certain entrances should be avoided only if we are leaving
+                    if (start_grid[child.x, child.y] == start_grid[target_pos.x,target_pos.y] && child != target_pos)
+                    {
+                        continue;
+                    }
+                    
+                    //seats should not be crossed unless it's the customer's designated seat
+                    if (start_grid[child.x,child.y] == -1 && child != target_pos)
                     {
                         continue;
                     }
