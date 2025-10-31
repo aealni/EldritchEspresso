@@ -18,7 +18,7 @@ public class ScoreManager : MonoBehaviour
 
             if (instance == null)
             {
-                instance = FindObjectOfType<ScoreManager>();
+                instance = FindFirstObjectByType<ScoreManager>();
 
                 if (instance == null)
                 {
@@ -36,6 +36,16 @@ public class ScoreManager : MonoBehaviour
     private int currentScore;
     private int dayHighScore;
     private int dayStartingScore;
+
+    [Header("Day Result Display")]
+    [SerializeField] private Vector2 dayResultBoxSize = new Vector2(220f, 80f);
+    [SerializeField] private Vector2 dayResultBoxOffset = new Vector2(20f, 20f);
+    [SerializeField] private float dayResultDisplayDuration = 3f;
+
+    private bool showDayResultBox;
+    private float dayResultTimer;
+    private int lastDayScore;
+    private GUIStyle dayResultBoxStyle;
 
     public event Action<int> OnScoreChanged;
     public event Action<int> OnDayHighScoreChanged;
@@ -108,6 +118,7 @@ public class ScoreManager : MonoBehaviour
             OnDayHighScoreChanged?.Invoke(dayHighScore);
         }
 
+        ShowDayResult(dayScore);
         OnDayFinished?.Invoke(dayScore);
         StartNewDay();
     }
@@ -137,5 +148,65 @@ public class ScoreManager : MonoBehaviour
             dayHighScore = dayScore;
             OnDayHighScoreChanged?.Invoke(dayHighScore);
         }
+    }
+
+    private void Update()
+    {
+        if (!showDayResultBox)
+        {
+            return;
+        }
+
+        if (dayResultDisplayDuration <= 0f)
+        {
+            return;
+        }
+
+        dayResultTimer -= Time.unscaledDeltaTime;
+
+        if (dayResultTimer <= 0f)
+        {
+            showDayResultBox = false;
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (!showDayResultBox)
+        {
+            return;
+        }
+
+        EnsureDayResultStyle();
+
+        var boxRect = new Rect(dayResultBoxOffset.x, dayResultBoxOffset.y, dayResultBoxSize.x, dayResultBoxSize.y);
+        GUI.Box(boxRect, $"Day Complete!\nScore: {lastDayScore}", dayResultBoxStyle);
+    }
+
+    private void ShowDayResult(int dayScore)
+    {
+        lastDayScore = dayScore;
+        showDayResultBox = true;
+
+        if (dayResultDisplayDuration > 0f)
+        {
+            dayResultTimer = dayResultDisplayDuration;
+        }
+    }
+
+    private void EnsureDayResultStyle()
+    {
+        if (dayResultBoxStyle != null)
+        {
+            return;
+        }
+
+        dayResultBoxStyle = new GUIStyle(GUI.skin.box)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = 18,
+            wordWrap = true
+        };
+        dayResultBoxStyle.padding = new RectOffset(12, 12, 12, 12);
     }
 }

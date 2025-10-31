@@ -4,7 +4,12 @@ public class Inventory : MonoBehaviour
 {
     [Header("Player Inventory - 4 Slots")]
     [SerializeField] private InventorySlot[] slots = new InventorySlot[4];
+    [SerializeField] private int selectedSlot = 0;
     public Sprite texture;
+    
+    // Events
+    public System.Action<int> OnSlotSelected;
+    public System.Action<InventorySlot> OnSlotChanged;
 
     private void Awake()
     {
@@ -13,16 +18,6 @@ public class Inventory : MonoBehaviour
         {
             slots[i] = new InventorySlot();
         }
-    }
-
-    /// <summary>
-    /// Adds an item to the inventory using stacking logic with exact parameter matching
-    /// </summary>
-    /// <param name="item">Item to add</param>
-    /// <returns>True if item was added successfully</returns>
-    public bool AddItem(Item item)
-    {
-        return AddItem(item, 1) > 0;
     }
 
     /// <summary>
@@ -101,16 +96,6 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
-    /// Removes item from specific slot
-    /// </summary>
-    /// <param name="slotIndex">The inventory slot (0-2)</param>
-    /// <returns>True if item was removed</returns>
-    public bool RemoveItem(int slotIndex)
-    {
-        return RemoveItemFromSlot(slotIndex, 1) > 0;
-    }
-
-    /// <summary>
     /// Removes a specific quantity of items matching the given item type (exact parameter matching)
     /// </summary>
     /// <param name="itemType">Item type to remove</param>
@@ -173,7 +158,7 @@ public class Inventory : MonoBehaviour
     /// <summary>
     /// Gets the quantity of items in a specific slot
     /// </summary>
-    /// <param name="slotIndex">Slot index (0-2)</param>
+    /// <param name="slotIndex">Slot index (0-3)</param>
     /// <returns>Quantity in slot, or 0 if empty/invalid</returns>
     public int GetSlotQuantity(int slotIndex)
     {
@@ -315,5 +300,183 @@ public class Inventory : MonoBehaviour
             }
         }
         Debug.Log("========================");
+    }
+    
+    // Slot selection and container interaction methods
+    
+    /// <summary>
+    /// Gets the currently selected slot index
+    /// </summary>
+    /// <returns>Selected slot index (0-3)</returns>
+    public int GetSelectedSlot()
+    {
+        return selectedSlot;
+    }
+    
+    /// <summary>
+    /// Selects an inventory slot
+    /// </summary>
+    /// <param name="slotIndex">Slot index to select (0-3)</param>
+    public void SelectSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= slots.Length)
+        {
+            Debug.LogWarning($"Invalid slot index: {slotIndex}");
+            return;
+        }
+        
+        selectedSlot = slotIndex;
+        OnSlotSelected?.Invoke(selectedSlot);
+        Debug.Log($"Selected inventory slot {selectedSlot}");
+    }
+    
+    /// <summary>
+    /// Gets the selected inventory slot
+    /// </summary>
+    /// <returns>Selected inventory slot</returns>
+    public InventorySlot GetSelectedSlotObject()
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return null;
+        return slots[selectedSlot];
+    }
+    
+    /// <summary>
+    /// Empties the selected slot by removing one item
+    /// </summary>
+    /// <returns>True if an item was removed</returns>
+    public bool EmptySelectedSlot()
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return false;
+        
+        if (!slots[selectedSlot].IsEmpty())
+        {
+            int removed = slots[selectedSlot].RemoveItems(1);
+            OnSlotChanged?.Invoke(slots[selectedSlot]);
+            Debug.Log($"Emptied 1 item from slot {selectedSlot}");
+            return removed > 0;
+        }
+        
+        Debug.Log($"Slot {selectedSlot} is already empty");
+        return false;
+    }
+    
+    /// <summary>
+    /// Adds an item from a container to the selected slot
+    /// </summary>
+    /// <param name="container">Container to get item from</param>
+    /// <returns>True if item was added successfully</returns>
+    public bool AddItemFromContainer(Container container)
+    {
+        if (container == null)
+        {
+            Debug.Log("No container provided");
+            return false;
+        }
+        
+        if (selectedSlot < 0 || selectedSlot >= slots.Length)
+        {
+            Debug.Log("Invalid selected slot");
+            return false;
+        }
+        
+        // Get available items from container
+        var availableItems = container.GetAvailableItems();
+        if (availableItems.Count == 0)
+        {
+            Debug.Log($"{container.ContainerName} is empty");
+            return false;
+        }
+        
+        // Try to add the first available item
+        Item itemToAdd = availableItems[0];
+        int transferred = container.TransferItemToPlayer(itemToAdd, 1, this);
+        
+        if (transferred > 0)
+        {
+            OnSlotChanged?.Invoke(slots[selectedSlot]);
+            Debug.Log($"Added {transferred} {itemToAdd.itemName} from {container.ContainerName} to slot {selectedSlot}");
+            return true;
+        }
+        
+        Debug.Log($"Could not add item from {container.ContainerName} - inventory full or item not available");
+        return false;
+    }
+    
+    /// <summary>
+    /// Checks if the selected slot is empty
+    /// </summary>
+    /// <returns>True if selected slot is empty</returns>
+    public bool IsSelectedSlotEmpty()
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return true;
+        return slots[selectedSlot].IsEmpty();
+    }
+    
+    /// <summary>
+    /// Gets the item in the selected slot
+    /// </summary>
+    /// <returns>Item in selected slot or null if empty</returns>
+    public Item GetSelectedSlotItem()
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return null;
+        return slots[selectedSlot].ItemType;
+    }
+    
+    /// <summary>
+    /// Gets the quantity in the selected slot
+    /// </summary>
+    /// <returns>Quantity in selected slot</returns>
+    public int GetSelectedSlotQuantity()
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return 0;
+        return slots[selectedSlot].CurrentStack;
+    }
+    
+    /// <summary>
+    /// Checks if the selected slot can accept a specific item
+    /// </summary>
+    /// <param name="item">Item to check</param>
+    /// <returns>True if selected slot can accept the item</returns>
+    public bool CanSelectedSlotAcceptItem(Item item)
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return false;
+        return slots[selectedSlot].CanAddItem(item);
+    }
+    
+    /// <summary>
+    /// Adds an item directly to the selected slot
+    /// </summary>
+    /// <param name="item">Item to add</param>
+    /// <param name="quantity">Quantity to add</param>
+    /// <returns>Number of items actually added</returns>
+    public int AddItemToSelectedSlot(Item item, int quantity = 1)
+    {
+        if (selectedSlot < 0 || selectedSlot >= slots.Length) return 0;
+        
+        int added = slots[selectedSlot].AddItems(item, quantity);
+        if (added > 0)
+        {
+            OnSlotChanged?.Invoke(slots[selectedSlot]);
+        }
+        return added;
+    }
+    
+    /// <summary>
+    /// Checks if the inventory has a specific item
+    /// </summary>
+    /// <param name="item">Item to check for</param>
+    /// <returns>True if inventory contains the item</returns>
+    public bool HasItem(Item item)
+    {
+        if (item == null) return false;
+        
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (!slots[i].IsEmpty() && slots[i].ItemType.CanStackWith(item))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

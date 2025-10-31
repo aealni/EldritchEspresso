@@ -19,7 +19,7 @@ public class Food : Item
     private void Awake()
     {
         itemType = ItemType.Food;
-        _maxStackSize = 10;
+        _maxStackSize = 1;
     }
     
     /// <summary>
