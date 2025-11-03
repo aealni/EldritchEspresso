@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed = 6f;
     private Rigidbody2D rb;
     private Vector2 movement;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+    private Vector2 lastMoveDirection = Vector2.down;
     
     [Header("Inventory")]
     [SerializeField] private Inventory inventory;
@@ -38,6 +41,9 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
         if (inventory == null)
             inventory = GetComponent<Inventory>();
         if (inputHandler == null)
@@ -90,6 +96,39 @@ public class PlayerController : MonoBehaviour
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         movement = new Vector2(moveX, moveY).normalized;
+        
+        // Update animator
+        if (animator != null)
+        {
+            bool isMoving = movement.sqrMagnitude > 0.01f;
+            
+            if (isMoving)
+            {
+                // Store the last direction when moving
+                lastMoveDirection = movement;
+            }
+            
+            // Set the isMoving bool FIRST
+            animator.SetBool("isMoving", isMoving);
+            
+            // Always update animator with current or last direction
+            // Vertical movement ALWAYS overrides horizontal
+            if (Mathf.Abs(lastMoveDirection.y) > 0.01f)
+            {
+                // Moving/facing vertically - ALWAYS prioritize this
+                animator.SetFloat("moveX", 0);
+                animator.SetFloat("moveY", lastMoveDirection.y);
+            }
+            else
+            {
+                // Moving/facing horizontally only when no vertical movement
+                animator.SetFloat("moveX", lastMoveDirection.x);
+                animator.SetFloat("moveY", 0);
+                
+                // Don't flip - let the animator handle left/right animations
+                // The animator has separate playerleft and playerright animations
+            }
+        }
     }
     
     /// <summary>

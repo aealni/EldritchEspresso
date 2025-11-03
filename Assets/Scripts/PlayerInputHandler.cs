@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     [Header("Input Settings")]
-    [SerializeField] private bool useNewInputSystem = false; // Disabled until InputSystem is properly set up
+    [SerializeField] private bool useNewInputSystem = true; // Disabled until InputSystem is properly set up
     
     // New Input System (commented out until InputSystem_Actions is generated)
     // private InputSystem_Actions inputActions;
