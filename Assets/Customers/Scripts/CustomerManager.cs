@@ -21,7 +21,7 @@ public class CustomerManager : MonoBehaviour
     [Header("Grid Settings")]
     [SerializeField] private Vector2 grid_offset = Vector2.zero; // Bottom Left Corner
     [SerializeField] private int grid_square_size = 1;
-    [SerializeField] private int padding = 2;
+    [SerializeField] private int padding = 1;
     [SerializeField] private Vector2Int grid_size = new Vector2Int(20, 15);    
 
 
@@ -48,8 +48,14 @@ public class CustomerManager : MonoBehaviour
     {
         Vector2Int new_spawn_pos = FindSpawnLocation();
         Vector2Int seat_target = FindSeat();
-        if (new_spawn_pos == new Vector2Int(-1, -1) || seat_target == new Vector2Int(-1, -1))
+        if (new_spawn_pos == new Vector2Int(-1, -1))
         {
+            Debug.LogWarning("No spawn location available!");
+            return;
+        }
+        if (seat_target == new Vector2Int(-1, -1))
+        {
+            Debug.LogWarning("No seat available!");
             return;
         }
 
@@ -70,12 +76,15 @@ public class CustomerManager : MonoBehaviour
         for (int i = 0; i < spawn_locations.Count(); i++)
         {
             Vector2Int pos = spawn_locations[i];
-            if (grid[pos.x, pos.y] == 0)
+            // Check if the spawn location is not occupied by a customer (customers have IDs >= 2)
+            // Compare with start_grid to see if it's in its original state (not occupied)
+            if (grid[pos.x, pos.y] == start_grid[pos.x, pos.y])
             {
                 return pos;
             }
         }
 
+        Debug.LogWarning($"All {spawn_locations.Count} spawn locations are occupied!");
         return new Vector2Int(-1, -1);
     }
 
@@ -84,18 +93,27 @@ public class CustomerManager : MonoBehaviour
         if (seats.Count == 0)
         {
             // Wait for seat TODO
-            Debug.LogWarning("No seats.");
+            Debug.LogWarning($"No seats available! Total seats in list: {seats.Count}");
             return new Vector2Int(-1, -1);
         }
 
         Vector2Int ans = seats[UnityEngine.Random.Range(0, seats.Count)];
         seats.Remove(ans);
+        Debug.Log($"Seat assigned at {ans}. Remaining available seats: {seats.Count}");
         return ans;
     }
 
     public static void ReturnSeat(Vector2Int pos)
     {
-        seats.Add(pos);
+        if (!seats.Contains(pos))
+        {
+            seats.Add(pos);
+            Debug.Log($"Seat returned at {pos}. Total available seats: {seats.Count}");
+        }
+        else
+        {
+            Debug.LogWarning($"Attempted to return seat at {pos} but it's already in the list!");
+        }
     }
 
     public static Vector2Int FindEntrance()
@@ -262,10 +280,10 @@ public class CustomerManager : MonoBehaviour
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
-            {1, 1, -1, -1, 1, -1, -1, 1, -1, 1},
+            {1, 1, 0, 0, 1, 0, 0, 1, 0, 1},
             {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
             {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
-            {1, 1, -1, -1, 1, -1, -1, 1, -1, 1},
+            {1, 1, 0, 0, 1, 0, 0, 1, 0, 1},
             {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},

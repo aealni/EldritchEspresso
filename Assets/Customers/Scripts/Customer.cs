@@ -101,7 +101,7 @@ public class Customer : MonoBehaviour
     void Leaving()
     {
         state = STATE.LEAVING;
-        CustomerManager.ReturnSeat(my_seat); // Return the correct seat position
+        // Don't return seat yet - wait until customer is destroyed
         target_pos = CustomerManager.FindEntrance();
     }
 
@@ -172,6 +172,7 @@ public class Customer : MonoBehaviour
                 else if (state == STATE.LEAVING)
                 {
                     CustomerManager.ResetSquare(curr_pos);
+                    CustomerManager.ReturnSeat(my_seat); // Return seat only when actually leaving
                     Destroy(gameObject);
                     return;
                 }
