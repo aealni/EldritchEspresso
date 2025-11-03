@@ -45,12 +45,14 @@ public class Customer : MonoBehaviour
     [SerializeField] Food order;
 
     [SerializeField] int id;
+    [SerializeField] Vector2Int my_seat; // Store the seat position to return it later
 
     public void Activate(int new_id, Vector2Int spawn_pos, Vector2Int seat)
     {
         id = new_id;
         curr_pos = spawn_pos;
         target_pos = seat;
+        my_seat = seat; // Remember which seat was assigned to this customer
 
         state = STATE.SEATING;
 
@@ -99,7 +101,7 @@ public class Customer : MonoBehaviour
     void Leaving()
     {
         state = STATE.LEAVING;
-        CustomerManager.ReturnSeat(curr_pos);
+        CustomerManager.ReturnSeat(my_seat); // Return the correct seat position
         target_pos = CustomerManager.FindEntrance();
     }
 

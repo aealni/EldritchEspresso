@@ -199,7 +199,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 99
+  m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -562,7 +562,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 99
+  m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -731,6 +731,56 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
+--- !u!1 &461712601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 461712603}
+  - component: {fileID: 461712602}
+  m_Layer: 0
+  m_Name: customermanager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &461712602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461712601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fa5ce076f69e25468f14a3db952396e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerManager
+  customer_prefab: {fileID: 5729986206214024015, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
+  spawn_delay: 1.5
+  grid_offset: {x: -11, y: -7}
+  grid_square_size: 1
+  padding: 2
+  grid_size: {x: 25, y: 12}
+--- !u!4 &461712603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461712601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.02129, y: -1.25251, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -786,9 +836,9 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.00024694204
+    x: 0.0002014935
     y: 0
-    width: 0.9995061
+    width: 0.999597
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
@@ -994,7 +1044,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 98
+  m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -1611,56 +1661,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!1 &679622321
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 679622323}
-  - component: {fileID: 679622322}
-  m_Layer: 0
-  m_Name: customermanager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &679622322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 679622321}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fa5ce076f69e25468f14a3db952396e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CustomerManager
-  customer_prefab: {fileID: 5729986206214024015, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
-  spawn_delay: 1.5
-  grid_offset: {x: -11, y: -7}
-  grid_square_size: 1
-  padding: 2
-  grid_size: {x: 20, y: 15}
---- !u!4 &679622323
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 679622321}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2608, y: -0.10452, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &724840955
 GameObject:
   m_ObjectHideFlags: 0
@@ -3254,19 +3254,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6788734558233030925, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_Size.x
-      value: 0.726347
+      value: 0.59719795
       objectReference: {fileID: 0}
     - target: {fileID: 6788734558233030925, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_Size.y
-      value: 0.5099897
+      value: 0.82301176
       objectReference: {fileID: 0}
     - target: {fileID: 6788734558233030925, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_Offset.x
-      value: 0.0020605624
+      value: -0.0061032474
       objectReference: {fileID: 0}
     - target: {fileID: 6788734558233030925, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_Offset.y
-      value: 0.1553336
+      value: -0.0030516982
       objectReference: {fileID: 0}
     - target: {fileID: 8541696039591013023, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3310,15 +3310,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9131698437185659834, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9131698437185659834, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9131698437185659834, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9131698437185659834, guid: dbedc474f00872841893ca35bbfe851d, type: 3}
       propertyPath: m_ConstrainProportionsScale
@@ -3729,4 +3729,4 @@ SceneRoots:
   - {fileID: 151266257}
   - {fileID: 1259727330}
   - {fileID: 2021532946}
-  - {fileID: 679622323}
+  - {fileID: 461712603}
