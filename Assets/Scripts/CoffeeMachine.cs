@@ -224,4 +224,9 @@ public class CoffeeMachine : Container
         Gizmos.color = isBrewing ? Color.red : (currentCoffee > 0 ? Color.green : Color.yellow);
         Gizmos.DrawWireCube(transform.position + Vector3.up * 0.5f, Vector3.one * 0.3f);
     }
+
+    /// <summary>
+    /// Exposes the configured brewed coffee item so other systems can discover menu items.
+    /// </summary>
+    public Item CoffeeItem => coffeeItem;
 }

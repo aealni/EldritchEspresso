@@ -97,10 +97,9 @@ public class CustomerManager : MonoBehaviour
             return new Vector2Int(-1, -1);
         }
 
-        Vector2Int ans = seats[UnityEngine.Random.Range(0, seats.Count)];
-        seats.Remove(ans);
-        Debug.Log($"Seat assigned at {ans}. Remaining available seats: {seats.Count}");
-        return ans;
+    Vector2Int ans = seats[UnityEngine.Random.Range(0, seats.Count)];
+    seats.Remove(ans);
+    return ans;
     }
 
     public static void ReturnSeat(Vector2Int pos)
@@ -108,11 +107,10 @@ public class CustomerManager : MonoBehaviour
         if (!seats.Contains(pos))
         {
             seats.Add(pos);
-            Debug.Log($"Seat returned at {pos}. Total available seats: {seats.Count}");
         }
         else
         {
-            Debug.LogWarning($"Attempted to return seat at {pos} but it's already in the list!");
+            // Silent: seat already tracked
         }
     }
 
@@ -259,7 +257,7 @@ public class CustomerManager : MonoBehaviour
         Vector2Int backtrack = target;
         if (!parent_lookup.ContainsKey(target))
         {
-            Debug.Log("No path found");
+            // No path found; keep current position
             return start;
         }
 
@@ -268,8 +266,6 @@ public class CustomerManager : MonoBehaviour
             path.Add(backtrack);
             backtrack = parent_lookup[backtrack];
         }
-
-        Debug.Log(path[path.Count - 1]);
 
         return path[path.Count - 1];
     }
@@ -290,10 +286,10 @@ public class CustomerManager : MonoBehaviour
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
             {1, 0, 0, 0, 0, 1, 1, 1, 0, 1},
-            {1, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-            {1, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-            {1, 0, 0, 0, 0, 1, 1, 0, 0, 1},
-            {1, 0, 0, 0, 0, 1, 1, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
             {1, -2, -2, 1, 1, 1, 1, 1, 1, 1},
         };
 
