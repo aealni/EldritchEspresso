@@ -59,6 +59,7 @@ public class Oven : Container
             {
                 Debug.Log("Cannot start baking: unknown state");
             }
+
         }
         
         // Check for F key to pick up pie
@@ -212,6 +213,7 @@ public class Oven : Container
         {
             currentPies++;
             Debug.Log($"Baking complete! Total pies: {currentPies}");
+
             // Show indicator now that at least one pie is ready
             UpdateReadyIndicator();
         }
@@ -280,6 +282,8 @@ public class Oven : Container
     private void UpdateReadyIndicator()
     {
         if (readyIndicator == null) return;
+        Debug.Log("GOT HERE" + $"{!isBaking} and {currentPies > 0}");
+
         bool show = !isBaking && currentPies > 0;
         if (readyIndicator.activeSelf != show)
         {
