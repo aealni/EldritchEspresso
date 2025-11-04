@@ -13,8 +13,6 @@ public abstract class Container : MonoBehaviour
     
     [Header("Visual Feedback")]
     [SerializeField] protected GameObject interactionPrompt;
-    [Tooltip("Optional; if present, this will be toggled when the player enters/leaves range to create a green outline/border highlight.")]
-    [SerializeField] protected ProximityHighlighter proximityHighlighter;
     
     protected bool playerInRange = false;
     protected Transform playerTransform;
@@ -45,15 +43,6 @@ public abstract class Container : MonoBehaviour
         if (interactionPrompt != null)
         {
             interactionPrompt.SetActive(false);
-        }
-        // Auto-grab a highlighter on the same GameObject if not assigned
-        if (proximityHighlighter == null)
-        {
-            proximityHighlighter = GetComponent<ProximityHighlighter>();
-            if (proximityHighlighter == null)
-            {
-                proximityHighlighter = gameObject.AddComponent<ProximityHighlighter>();
-            }
         }
     }
     
@@ -102,10 +91,6 @@ public abstract class Container : MonoBehaviour
         {
             interactionPrompt.SetActive(true);
         }
-        if (proximityHighlighter != null)
-        {
-            proximityHighlighter.Show();
-        }
         
         Debug.Log($"Player entered range of {containerName}");
     }
@@ -118,10 +103,6 @@ public abstract class Container : MonoBehaviour
         if (interactionPrompt != null)
         {
             interactionPrompt.SetActive(false);
-        }
-        if (proximityHighlighter != null)
-        {
-            proximityHighlighter.Hide();
         }
         
         Debug.Log($"Player exited range of {containerName}");
