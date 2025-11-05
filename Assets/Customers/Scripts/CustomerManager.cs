@@ -7,30 +7,35 @@ public class CustomerManager : MonoBehaviour
 {
     [Header("Customer Settings")]
     public GameObject customer_prefab; // changes to non static so we can drag in
-    public static float spawn_delay = 1.5F;
-    static float timer;
+    [SerializeField] private float spawn_delay = 1.5F;
+    private float timer;
 
     /*
     1 are walls
     -1 are seats
     -2 are entrances
     */
-    static int[,] grid;
-    static int[,] start_grid;
+    private static int[,] grid;
+    private static int[,] start_grid;
 
     [Header("Grid Settings")]
-
-    static readonly Vector2 grid_offset = Vector2.zero; // Bottom Left Corner
-    static readonly int grid_square_size = 1;
-    static readonly int padding = 2;    
-
-
-    static List<Vector2Int> seats = new();
-    static readonly List<Vector2Int> entrances = new();
-    static List<Vector2Int> spawn_locations = new();
+    [SerializeField] private Vector2 grid_offset = Vector2.zero; // Bottom Left Corner
+    [SerializeField] private int grid_square_size = 1;
+    [SerializeField] private int padding = 1;
+    [SerializeField] private Vector2Int grid_size = new Vector2Int(20, 15);    
 
 
-    static int id_count = 2;
+    private static List<Vector2Int> seats = new();
+    private static readonly List<Vector2Int> entrances = new();
+    private static List<Vector2Int> spawn_locations = new();
+
+    private static int id_count = 2;
+    private static CustomerManager instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,8 +48,14 @@ public class CustomerManager : MonoBehaviour
     {
         Vector2Int new_spawn_pos = FindSpawnLocation();
         Vector2Int seat_target = FindSeat();
-        if (new_spawn_pos == new Vector2Int(-1, -1) || seat_target == new Vector2Int(-1, -1))
+        if (new_spawn_pos == new Vector2Int(-1, -1))
         {
+            Debug.LogWarning("No spawn location available!");
+            return;
+        }
+        if (seat_target == new Vector2Int(-1, -1))
+        {
+            Debug.LogWarning("No seat available!");
             return;
         }
 
@@ -65,12 +76,15 @@ public class CustomerManager : MonoBehaviour
         for (int i = 0; i < spawn_locations.Count(); i++)
         {
             Vector2Int pos = spawn_locations[i];
-            if (grid[pos.x, pos.y] == 0)
+            // Check if the spawn location is not occupied by a customer (customers have IDs >= 2)
+            // Compare with start_grid to see if it's in its original state (not occupied)
+            if (grid[pos.x, pos.y] == start_grid[pos.x, pos.y])
             {
                 return pos;
             }
         }
 
+        Debug.LogWarning($"All {spawn_locations.Count} spawn locations are occupied!");
         return new Vector2Int(-1, -1);
     }
 
@@ -79,18 +93,25 @@ public class CustomerManager : MonoBehaviour
         if (seats.Count == 0)
         {
             // Wait for seat TODO
-            Debug.LogWarning("No seats.");
+            Debug.LogWarning($"No seats available! Total seats in list: {seats.Count}");
             return new Vector2Int(-1, -1);
         }
 
-        Vector2Int ans = seats[UnityEngine.Random.Range(0, seats.Count)];
-        seats.Remove(ans);
-        return ans;
+    Vector2Int ans = seats[UnityEngine.Random.Range(0, seats.Count)];
+    seats.Remove(ans);
+    return ans;
     }
 
     public static void ReturnSeat(Vector2Int pos)
     {
-        seats.Add(pos);
+        if (!seats.Contains(pos))
+        {
+            seats.Add(pos);
+        }
+        else
+        {
+            // Silent: seat already tracked
+        }
     }
 
     public static Vector2Int FindEntrance()
@@ -112,14 +133,16 @@ public class CustomerManager : MonoBehaviour
 
     public static Vector2 GridToWorld(Vector2Int pos)
     {
-        return (pos * grid_square_size) + grid_offset + Vector2.one * (grid_square_size / 2F);
+        if (instance == null) return Vector2.zero;
+        return (pos * instance.grid_square_size) + instance.grid_offset + Vector2.one * (instance.grid_square_size / 2F);
     }
 
     // TODO
     public static Vector2Int WorldToGrid(Vector2 pos)
     {
-        Vector2 swp = pos - (grid_offset + Vector2.one * (grid_square_size / 2F));
-        return new Vector2Int((int)swp.x, (int)swp.y) / grid_square_size;
+        if (instance == null) return Vector2Int.zero;
+        Vector2 swp = pos - (instance.grid_offset + Vector2.one * (instance.grid_square_size / 2F));
+        return new Vector2Int((int)swp.x, (int)swp.y) / instance.grid_square_size;
     }
 
     public static void SetSquare(Vector2Int pos, int curr_id)
@@ -135,7 +158,7 @@ public class CustomerManager : MonoBehaviour
         grid[curr_pos.x, curr_pos.y] = start_grid[curr_pos.x, curr_pos.y];
     }
 
-    public static Vector2Int Astar(Vector2Int start, Vector2Int target, int id)
+    public static Vector2Int Astar(Vector2Int start, Vector2Int target, int id, Vector2Int target_pos)
     {
         if (start == target)
         {
@@ -186,9 +209,27 @@ public class CustomerManager : MonoBehaviour
                     {
                         continue;
                     }
-                    
+
                     //fail cases
-                    if (child.x < 0 || child.y < 0 || child.x >= grid.GetLength(0) || child.y >= grid.GetLength(1) || (grid[child.x, child.y] > 0 && grid[child.x, child.y] < id))
+                    if (child.x < 0 || child.y < 0 || child.x >= grid.GetLength(0) || child.y >= grid.GetLength(1))
+                    {
+                        continue;
+                    }
+
+                    //obstacles or higher priority customers
+                    if (grid[child.x, child.y] > 0 && grid[child.x, child.y] < id)
+                    {
+                        continue;
+                    }
+
+                    //certain entrances should be avoided only if we are leaving
+                    if (start_grid[child.x, child.y] == start_grid[target_pos.x,target_pos.y] && child != target_pos)
+                    {
+                        continue;
+                    }
+                    
+                    //seats should not be crossed unless it's the customer's designated seat
+                    if (start_grid[child.x,child.y] == -1 && child != target_pos)
                     {
                         continue;
                     }
@@ -216,7 +257,7 @@ public class CustomerManager : MonoBehaviour
         Vector2Int backtrack = target;
         if (!parent_lookup.ContainsKey(target))
         {
-            Debug.Log("No path found");
+            // No path found; keep current position
             return start;
         }
 
@@ -226,38 +267,30 @@ public class CustomerManager : MonoBehaviour
             backtrack = parent_lookup[backtrack];
         }
 
-        Debug.Log(path[path.Count - 1]);
-
         return path[path.Count - 1];
     }
 
-    static void CreateGrid()
+    void CreateGrid()
     {
         int[,] data = {
-            {1, 1, 1, -2, -2, -2, -2, -2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
+            {1, 1, 0, 0, 1, 0, 0, 1, 0, 1},
+            {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
+            {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
+            {1, 1, 0, 0, 1, 0, 0, 1, 0, 1},
+            {1, -1, 0, 0, -1, 0, 0, -1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 1, 1, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, -2, -2, 1, 1, 1, 1, 1, 1, 1},
         };
 
         grid = new int[data.GetLength(0) + 2 * padding, data.GetLength(1) + 2 * padding];
@@ -274,7 +307,7 @@ public class CustomerManager : MonoBehaviour
 
     }
 
-    static void ParseGrid()
+    void ParseGrid()
     {
         for (int x = 0; x < grid.GetLength(0); x++) //Rows
         {
@@ -318,6 +351,14 @@ public class CustomerManager : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        // Create grid for visualization in edit mode if it doesn't exist
+        if (grid == null)
+        {
+            CreateGrid();
+        }
+        
+        if (grid == null) return;
+        
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
@@ -326,27 +367,26 @@ public class CustomerManager : MonoBehaviour
                 {
                     Gizmos.color = Color.red;
                 }
-                if (grid[i, j] == -1) //Mark seats
+                else if (grid[i, j] == -1) //Mark seats
                 {
                     Gizmos.color = Color.blue;
                 }
-                if (grid[i, j] == 0) //Mark seats
+                else if (grid[i, j] == 0) //Mark walkable
                 {
                     Gizmos.color = Color.white;
                 }
-                if (grid[i, j] == 1)
+                else if (grid[i, j] == 1)
                 {
                     Gizmos.color = Color.black;
                 }
-                // if ((i < padding || i >= (grid.GetLength(0) - padding)) && (j < padding || j >= (grid.GetLength(1) - padding)))
-                // {
-                //     Gizmos.color = Color.grey;
-                // }
-                if (grid[i, j] >= 2)
+                else if (grid[i, j] >= 2)
                 {
                     Gizmos.color = Color.green;
                 }
-                Gizmos.DrawWireCube(GridToWorld(new Vector2Int(i, j)), new Vector2(grid_square_size, grid_square_size) / 2);
+                
+                // Calculate position directly for gizmos (don't rely on instance)
+                Vector2 position = (new Vector2(i, j) * grid_square_size) + grid_offset + Vector2.one * (grid_square_size / 2F);
+                Gizmos.DrawWireCube(position, Vector2.one * grid_square_size);
             }
         }
     }

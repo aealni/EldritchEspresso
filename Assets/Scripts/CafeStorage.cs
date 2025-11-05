@@ -1,8 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "New CafeStorage", menuName = "Cafe Simulator/CafeStorage")]
-public class CafeStorage : ScriptableObject
+/// <summary>
+/// Cafe storage container that can hold and transfer items
+/// </summary>
+public class CafeStorage : Container
 {
     [Header("Storage Information")]
     [SerializeField] private string storageName;
@@ -232,26 +234,6 @@ public class CafeStorage : ScriptableObject
     }
     
     /// <summary>
-    /// Gets the quantity of a specific item in storage (exact parameter matching)
-    /// </summary>
-    /// <param name="item">Item to count</param>
-    /// <returns>Total quantity of matching items</returns>
-    public int GetItemQuantity(Item item)
-    {
-        if (item == null) return 0;
-        
-        int count = 0;
-        foreach (Item storageItem in items)
-        {
-            if (storageItem != null && storageItem.CanStackWith(item))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-    
-    /// <summary>
     /// Removes a specific quantity of matching items from storage (exact parameter matching)
     /// </summary>
     /// <param name="item">Item type to remove</param>
@@ -356,5 +338,88 @@ public class CafeStorage : ScriptableObject
             Debug.LogError($"Transfer failed: Could not add {item.itemName} to inventory");
             return TransferResult.InventoryFull;
         }
+    }
+    
+    // Container-specific methods
+    
+    protected override void Start()
+    {
+        base.Start();
+        containerName = storageName;
+    }
+    
+    /// <summary>
+    /// Called when player interacts with the cafe storage
+    /// </summary>
+    /// <param name="playerTransform">Player transform</param>
+    public override void OnInteract(Transform playerTransform)
+    {
+        if (!CanInteract(playerTransform)) return;
+        
+        Debug.Log($"Interacting with {containerName}");
+        
+        // For now, just log available items
+        // In a full implementation, this would open a UI
+        List<Item> availableItems = GetAvailableItems();
+        Debug.Log($"Available items in {containerName}: {availableItems.Count}");
+        
+        foreach (Item item in availableItems)
+        {
+            Debug.Log($"- {item.itemName} (x{GetItemQuantity(item)})");
+        }
+    }
+    
+    /// <summary>
+    /// Gets all available items in the cafe storage
+    /// </summary>
+    /// <returns>List of available items</returns>
+    public override List<Item> GetAvailableItems()
+    {
+        return new List<Item>(items);
+    }
+    
+    /// <summary>
+    /// Transfers an item from the cafe storage to the player
+    /// </summary>
+    /// <param name="item">Item to transfer</param>
+    /// <param name="quantity">Quantity to transfer</param>
+    /// <param name="playerInventory">Player's inventory</param>
+    /// <returns>Number of items actually transferred</returns>
+    public override int TransferItemToPlayer(Item item, int quantity, Inventory playerInventory)
+    {
+        if (item == null || playerInventory == null) return 0;
+        
+        // Use existing transfer method
+        TransferResult result = TransferToInventory(item, playerInventory, quantity);
+        
+        switch (result)
+        {
+            case TransferResult.Success:
+                return quantity;
+            case TransferResult.PartialSuccess:
+                return quantity - GetItemQuantity(item); // Calculate how many were actually transferred
+            default:
+                return 0;
+        }
+    }
+    
+    /// <summary>
+    /// Gets the quantity of a specific item in the cafe storage
+    /// </summary>
+    /// <param name="item">Item to count</param>
+    /// <returns>Quantity of the item</returns>
+    public override int GetItemQuantity(Item item)
+    {
+        if (item == null) return 0;
+        
+        int count = 0;
+        foreach (Item storageItem in items)
+        {
+            if (storageItem != null && storageItem.CanStackWith(item))
+            {
+                count++;
+            }
+        }
+        return count;
     }
 }
