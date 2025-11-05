@@ -35,6 +35,8 @@ public class GameTime : MonoBehaviour
                     break;
                 case 150f:
                     GameStateManager.Instance.ChangeState(GameStateManager.GameState.Upgrade);
+                    // Reset the day timer so the cycle repeats
+                    gameTime = 0f;
                     break;
                 default:
                     break;

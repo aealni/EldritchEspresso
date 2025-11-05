@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -64,6 +65,14 @@ public class ScoreManager : MonoBehaviour
         StartNewDay();
     }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void EnsureInstanceOnLoad()
+    {
+        // Force-create the singleton early so it is present in scenes
+        // even if nothing directly references it yet.
+        _ = Instance;
+    }
+
     private void OnDestroy()
     {
         if (Instance == this)
@@ -75,6 +84,16 @@ public class ScoreManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         applicationIsQuitting = true;
+    }
+
+    private void OnEnable()
+    {
+        GameStateManager.OnGameStateChange += HandleGameStateChange;
+    }
+
+    private void OnDisable()
+    {
+        GameStateManager.OnGameStateChange -= HandleGameStateChange;
     }
 
     public IReadOnlyDictionary<string, int> MiniGameScores => miniGameScores;
@@ -118,7 +137,11 @@ public class ScoreManager : MonoBehaviour
             OnDayHighScoreChanged?.Invoke(dayHighScore);
         }
 
-        ShowDayResult(dayScore);
+        // Only show the result box in CafeScene, as requested
+        if (SceneManager.GetActiveScene().name == "CafeScene")
+        {
+            ShowDayResult(dayScore);
+        }
         OnDayFinished?.Invoke(dayScore);
         StartNewDay();
     }
@@ -208,5 +231,14 @@ public class ScoreManager : MonoBehaviour
             wordWrap = true
         };
         dayResultBoxStyle.padding = new RectOffset(12, 12, 12, 12);
+    }
+
+    private void HandleGameStateChange(GameStateManager.GameState state)
+    {
+        // When the game enters the Result phase, end the day and show score
+        if (state == GameStateManager.GameState.Result)
+        {
+            EndDay();
+        }
     }
 }
