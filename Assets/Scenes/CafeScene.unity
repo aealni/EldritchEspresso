@@ -1677,7 +1677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerManager
   customer_prefab: {fileID: 1013508222}
-  spawn_delay: 7
+  spawn_delay: 5
   grid_offset: {x: -11, y: -7}
   grid_square_size: 1
   padding: 2
@@ -3601,7 +3601,7 @@ PrefabInstance:
       objectReference: {fileID: 461088442}
     - target: {fileID: 1757107864428070206, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
       propertyPath: eating_duration
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1757107864428070206, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
       propertyPath: interactionRange
@@ -3609,11 +3609,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1757107864428070206, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
       propertyPath: serving_patience
-      value: 15
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1757107864428070206, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
       propertyPath: ordering_patience
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1757107864428070206, guid: ccc03075bf11f4a4f81083023166d566, type: 3}
       propertyPath: 'menu.Array.data[0]'
