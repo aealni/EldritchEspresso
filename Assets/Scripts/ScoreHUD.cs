@@ -23,29 +23,33 @@ public class ScoreHUD : MonoBehaviour
         // Access GUI.skin only within OnGUI
         style = new GUIStyle(GUI.skin.label)
         {
-            alignment = TextAnchor.UpperRight,
+            alignment = TextAnchor.UpperCenter,
             fontSize = fontSize,
-            normal = { textColor = textColor }
+            fontStyle = FontStyle.Bold
         };
+        // Set the text color directly in the style's normal state
+        style.normal.textColor = textColor;
     }
 
     private void OnGUI()
     {
+        // Recreate style each frame to ensure it works in builds
+        style = null;
         EnsureStyle();
+        
         int score = ScoreManager.Instance ? ScoreManager.Instance.GetCurrentScore() : 0;
 
         string text = $"Score: {score}";
         Vector2 size = style.CalcSize(new GUIContent(text));
 
-        float x = Screen.width - size.x - margin.x;
+        float x = (Screen.width - size.x) / 2f;
         float y = margin.y;
         Rect rect = new Rect(x, y, size.x, size.y);
 
         // Shadow for readability
-        var prevColor = GUI.color;
-        GUI.color = shadowColor;
-        GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, style);
-        GUI.color = prevColor;
+        GUIStyle shadowStyle = new GUIStyle(style);
+        shadowStyle.normal.textColor = shadowColor;
+        GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, shadowStyle);
 
         // Main text
         GUI.Label(rect, text, style);
