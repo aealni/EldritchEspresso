@@ -28,8 +28,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 25
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -107,14 +107,15 @@ MonoBehaviour:
   serving_patience: 5
   eating_duration: 5
   timer: -0.0013810694
-  movement_speed: 3
-  entrance_pos: {x: 0, y: 0}
+  movement_speed: 6
   curr_pos: {x: 0, y: 0}
   target_pos: {x: -1, y: -1}
   next_move_pos: {x: -1, y: -1}
-  grid_offset: {x: 0, y: 0}
-  grid_square_size: 1
+  sprite_renderer: {fileID: 0}
   state: 4
-  menu: []
+  menu:
+  - {fileID: 0}
   order: {fileID: 0}
-  curr_id: 2
+  id: 0
+  my_seat: {x: 0, y: 0}
+  interactionRange: 2

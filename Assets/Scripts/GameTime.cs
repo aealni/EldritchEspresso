@@ -49,6 +49,24 @@ public class GameTime : MonoBehaviour
             yield return new WaitForSeconds(1f);
             gameTimeSeconds += 1;
             //Debug.Log("Game Time: " + gameTimeSeconds + " seconds");
+            gameTime += 1f;
+            //Debug.Log("Game Time: " + gameTime + " seconds");
+            switch (gameTime)
+            { 
+                case 60f:
+                    GameStateManager.Instance.ChangeState(GameStateManager.GameState.Service);
+                    break;
+                case 120f:
+                    GameStateManager.Instance.ChangeState(GameStateManager.GameState.Result);
+                    break;
+                case 150f:
+                    GameStateManager.Instance.ChangeState(GameStateManager.GameState.Upgrade);
+                    // Reset the day timer so the cycle repeats
+                    gameTime = 0f;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
