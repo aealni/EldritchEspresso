@@ -394,7 +394,8 @@ public class Customer : MonoBehaviour
                     {
                         points = Mathf.Max(1, food.cost);
                     }
-                    ScoreManager.Instance?.AddMiniGameScore("ServeCustomer", points);
+                    ScoreManager.Instance?.ApplyScoreDelta(points);
+                    Debug.Log($"Customer {id} received correct order! Gained {points} points.");
                 }
             }
         }

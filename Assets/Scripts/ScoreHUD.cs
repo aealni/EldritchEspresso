@@ -12,46 +12,33 @@ public class ScoreHUD : MonoBehaviour
     [SerializeField] private Color textColor = Color.white;
     [SerializeField] private Color shadowColor = new Color(0f, 0f, 0f, 0.6f);
 
-    private GUIStyle style;
-
-    // Do not touch GUI in Awake; styles are created lazily in OnGUI to avoid GUIUtility errors.
-    private void Awake() { }
-
-    private void EnsureStyle()
+    private void OnGUI()
     {
-        if (style != null) return;
-        // Access GUI.skin only within OnGUI
-        style = new GUIStyle(GUI.skin.label)
+        // Get score first
+        int score = ScoreManager.Instance ? ScoreManager.Instance.GetCurrentScore() : 0;
+        string text = $"Score: {score}";
+        
+        // Recreate style each frame to ensure it works in builds
+        GUIStyle mainStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.UpperCenter,
             fontSize = fontSize,
             fontStyle = FontStyle.Bold
         };
-        // Set the text color directly in the style's normal state
-        style.normal.textColor = textColor;
-    }
+        mainStyle.normal.textColor = textColor;
 
-    private void OnGUI()
-    {
-        // Recreate style each frame to ensure it works in builds
-        style = null;
-        EnsureStyle();
-        
-        int score = ScoreManager.Instance ? ScoreManager.Instance.GetCurrentScore() : 0;
-
-        string text = $"Score: {score}";
-        Vector2 size = style.CalcSize(new GUIContent(text));
+        Vector2 size = mainStyle.CalcSize(new GUIContent(text));
 
         float x = (Screen.width - size.x) / 2f;
         float y = margin.y;
         Rect rect = new Rect(x, y, size.x, size.y);
 
         // Shadow for readability
-        GUIStyle shadowStyle = new GUIStyle(style);
+        GUIStyle shadowStyle = new GUIStyle(mainStyle);
         shadowStyle.normal.textColor = shadowColor;
         GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, shadowStyle);
 
         // Main text
-        GUI.Label(rect, text, style);
+        GUI.Label(rect, text, mainStyle);
     }
 }
