@@ -159,7 +159,7 @@ public class ScoreManager : MonoBehaviour
         return currentScore;
     }
 
-    private void ApplyScoreDelta(int amount)
+    public void ApplyScoreDelta(int amount)
     {
         currentScore += amount;
         OnScoreChanged?.Invoke(currentScore);

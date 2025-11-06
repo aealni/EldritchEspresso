@@ -48,8 +48,22 @@ public class Customer : MonoBehaviour
     [SerializeField] Vector2Int my_seat; // Store the seat position to return it later
     
     [Header("Interaction")]
-    [SerializeField] private float interactionRange = 2f;
+    [SerializeField] private float interactionRange = 5f;
+    [Tooltip("Shown when player is in range. E.g., a child circle sprite under the customer.")]
+    [SerializeField] private GameObject rangeIndicator;
     private Transform playerTransform;
+    private bool playerInRange = false;
+
+    private void Awake()
+    {
+        // Cache the SpriteRenderer at awake so it's always available
+        if (sprite_renderer == null)
+        {
+            sprite_renderer = GetComponent<SpriteRenderer>();
+        }
+        // Ensure the range indicator starts hidden
+        if (rangeIndicator != null) rangeIndicator.SetActive(false);
+    }
 
     public void Activate(int new_id, Vector2Int spawn_pos, Vector2Int seat)
     {
@@ -60,7 +74,11 @@ public class Customer : MonoBehaviour
 
         state = STATE.SEATING;
 
-        sprite_renderer = GetComponent<SpriteRenderer>();
+        // Redundant safety in case Awake hasn't run yet
+        if (sprite_renderer == null)
+        {
+            sprite_renderer = GetComponent<SpriteRenderer>();
+        }
     }
 
     void Ordering()
@@ -128,8 +146,8 @@ public class Customer : MonoBehaviour
             return;
         }
         
-    // Wait indefinitely for the player to take the order
-    timer = -1;
+        // Set timer based on ordering_patience (if > 0, use it; otherwise wait indefinitely)
+        timer = ordering_patience > 0 ? ordering_patience : -1;
     }
 
     public Item TakeOrder()
@@ -144,8 +162,8 @@ public class Customer : MonoBehaviour
             return null;
         }
         state = STATE.WAITING;
-    // After taking the order, wait indefinitely until the correct item is given
-    timer = -1;
+        // Set timer based on serving_patience (if > 0, use it; otherwise wait indefinitely)
+        timer = serving_patience > 0 ? serving_patience : -1;
         Debug.Log($"Customer {id} order taken: {order.itemName}");
         return order;
     }
@@ -195,6 +213,18 @@ public class Customer : MonoBehaviour
     }
     void Leaving()
     {
+        // Check if customer is leaving without eating (lost customer = lose score)
+        if (state == STATE.ORDERING || state == STATE.WAITING)
+        {
+            int penalty = 1; // Score penalty for losing a customer
+            if (order is Food food)
+            {
+                penalty = Mathf.Max(1, Mathf.CeilToInt(food.cost / 2f)); // Penalty is half of food cost, rounded up, minimum 1
+            }
+            ScoreManager.Instance?.ApplyScoreDelta(-penalty);
+            Debug.LogWarning($"Customer {id} left unsatisfied! Lost {penalty} points.");
+        }
+        
         state = STATE.LEAVING;
         // Don't return seat yet - wait until customer is destroyed
         target_pos = CustomerManager.FindEntrance();
@@ -271,6 +301,8 @@ public class Customer : MonoBehaviour
                 {
                     CustomerManager.ResetSquare(curr_pos);
                     CustomerManager.ReturnSeat(my_seat); // Return seat only when actually leaving
+                    // Hide range indicator when leaving
+                    if (rangeIndicator != null) rangeIndicator.SetActive(false);
                     Destroy(gameObject);
                     return;
                 }
@@ -298,12 +330,21 @@ public class Customer : MonoBehaviour
         
         // Check if player is in range
         float distance = Vector2.Distance(transform.position, playerTransform.position);
-        if (distance > interactionRange) return;
+        bool inRange = distance <= interactionRange;
         
-        // Check for F key press
-        if (Input.GetKeyDown(KeyCode.F))
+        // Update range indicator visibility (same as oven)
+        UpdateRangeIndicator(inRange);
+        playerInRange = inRange;
+        
+        // Debug: Show when player is near
+        if (inRange && Input.GetKeyDown(KeyCode.F))
         {
+            Debug.Log($"Customer {id}: Player in range (distance: {distance:F2}), state: {state}, trying to interact...");
             TryReceiveFood();
+        }
+        else if (Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log($"Customer {id}: Player too far (distance: {distance:F2}, need: {interactionRange})");
         }
     }
     
@@ -360,6 +401,24 @@ public class Customer : MonoBehaviour
         else
         {
             Debug.Log($"Player doesn't have {order.itemName}. Customer wants: {order.itemName}");
+        }
+    }
+    
+    /// <summary>
+    /// Updates the range indicator visibility based on player proximity (same as Oven)
+    /// </summary>
+    private void UpdateRangeIndicator(bool inRange)
+    {
+        if (rangeIndicator == null)
+        {
+            Debug.LogWarning($"Customer {id}: Range indicator is NULL! Assign a GameObject to the Range Indicator field in the Inspector.");
+            return;
+        }
+        
+        // Show range indicator when player is in range
+        if (rangeIndicator.activeSelf != inRange)
+        {
+            rangeIndicator.SetActive(inRange);
         }
     }
 }

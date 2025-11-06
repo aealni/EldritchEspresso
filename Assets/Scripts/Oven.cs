@@ -23,6 +23,8 @@ public class Oven : Container
     [SerializeField] private GameObject readyIndicator;
     [Tooltip("Optional Animator on the oven for visual feedback. Expects bools: IsBaking, HasReady")] 
     [SerializeField] private Animator animator;
+    [Tooltip("Shown when player is in range. E.g., a child square/highlight sprite under the oven.")]
+    [SerializeField] private GameObject rangeIndicator;
     
     private Coroutine bakingCoroutine;
     
@@ -32,6 +34,8 @@ public class Oven : Container
         containerName = "Oven";
         // Ensure the ready indicator starts hidden
         if (readyIndicator != null) readyIndicator.SetActive(false);
+        // Ensure the range indicator starts hidden
+        if (rangeIndicator != null) rangeIndicator.SetActive(false);
         if (animator == null) animator = GetComponent<Animator>();
         SyncAnimator();
     }
@@ -70,6 +74,8 @@ public class Oven : Container
 
         // Update ready indicator visibility
         UpdateReadyIndicator();
+        // Update range indicator visibility
+        UpdateRangeIndicator();
         SyncAnimator();
     }
     
@@ -282,19 +288,46 @@ public class Oven : Container
     private void UpdateReadyIndicator()
     {
         if (readyIndicator == null) return;
-        Debug.Log("GOT HERE" + $"{!isBaking} and {currentPies > 0}");
-
-        bool show = !isBaking && currentPies > 0;
+        
+        // Show exclamation when there's any pie available (even while still baking more)
+        bool show = currentPies > 0;
         if (readyIndicator.activeSelf != show)
         {
             readyIndicator.SetActive(show);
         }
     }
 
+    private void UpdateRangeIndicator()
+    {
+        if (rangeIndicator == null) return;
+        
+        // Show range indicator when player is in range
+        if (rangeIndicator.activeSelf != playerInRange)
+        {
+            rangeIndicator.SetActive(playerInRange);
+        }
+    }
+
     private void SyncAnimator()
     {
         if (animator == null) return;
-        animator.SetBool("IsBaking", isBaking);
-        animator.SetBool("HasReady", !isBaking && currentPies > 0);
+        
+        // Only animate when the oven is visible (on-screen)
+        bool isVisible = IsVisibleInCamera();
+        animator.enabled = isVisible;
+        
+        if (isVisible)
+        {
+            animator.SetBool("IsBaking", isBaking);
+            animator.SetBool("HasReady", currentPies > 0);
+        }
+    }
+
+    private bool IsVisibleInCamera()
+    {
+        // Check if oven's renderer is visible to any camera
+        var renderer = GetComponent<Renderer>();
+        if (renderer == null) renderer = GetComponentInChildren<Renderer>();
+        return renderer != null && renderer.isVisible;
     }
 }
