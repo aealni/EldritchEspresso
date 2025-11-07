@@ -18,27 +18,30 @@ public class ScoreHUD : MonoBehaviour
         int score = ScoreManager.Instance ? ScoreManager.Instance.GetCurrentScore() : 0;
         string text = $"Score: {score}";
         
-        // Recreate style each frame to ensure it works in builds
+        // Create style - simpler approach
         GUIStyle mainStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.UpperCenter,
             fontSize = fontSize,
-            fontStyle = FontStyle.Bold
+            fontStyle = FontStyle.Bold,
+            normal = new GUIStyleState { textColor = textColor }
         };
-        mainStyle.normal.textColor = textColor;
 
-        Vector2 size = mainStyle.CalcSize(new GUIContent(text));
-
-        float x = (Screen.width - size.x) / 2f;
+        // Use a fixed width rect to avoid sizing issues
+        float width = 200f; // Wide enough for "Score: 999999"
+        float height = fontSize + 10f;
+        float x = (Screen.width - width) / 2f;
         float y = margin.y;
-        Rect rect = new Rect(x, y, size.x, size.y);
+        Rect rect = new Rect(x, y, width, height);
 
         // Shadow for readability
-        GUIStyle shadowStyle = new GUIStyle(mainStyle);
-        shadowStyle.normal.textColor = shadowColor;
-        GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, shadowStyle);
-
+        Color originalColor = GUI.contentColor;
+        GUI.contentColor = shadowColor;
+        GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, mainStyle);
+        
         // Main text
+        GUI.contentColor = textColor;
         GUI.Label(rect, text, mainStyle);
+        GUI.contentColor = originalColor;
     }
 }
